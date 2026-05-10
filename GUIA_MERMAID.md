@@ -1,799 +1,1260 @@
-# Aula Mermaid — Personalizações em `stateDiagram`
+# Guia Mermaid de Referência Pública
 
-> **Material de referência consolidado**  
-> Arquivo Markdown com as **8 aulas completas** sobre personalizações em blocos Mermaid, com foco em `stateDiagram`, `classDef`, SVG, CSS, tema e correção em página HTML local-first standalone.
+> **Guia revisado para publicação**  
+> Escopo: cobertura prática dos principais tipos de diagrama Mermaid, com aprofundamento em `flowchart`, `sequenceDiagram`, `classDiagram` e referência completa de `stateDiagram-v2`, além de personalização visual, integração em Markdown/HTML, depuração e acessibilidade.
+
+---
+
+## Metadados do guia
+
+| Campo | Valor |
+|---|---|
+| Versão deste guia | `3.1.1` |
+| Data da revisão | 2026-05-10 |
+| Versão Mermaid usada como referência principal | Mermaid `11.14.0` |
+| Foco aprofundado | `flowchart`, `sequenceDiagram`, `classDiagram`, `stateDiagram-v2`, `classDef`, SVG, CSS, tema e integração local-first |
+| Público-alvo | pessoas que escrevem documentação técnica, READMEs, wikis, guias públicos e páginas HTML com Mermaid |
+| Status editorial | Guia público revisado para publicação, com correções estruturais, exemplos práticos e lacunas técnicas saneadas |
+
+> **Nota editorial:** este guia prioriza completude, exemplos reais e capacidade de consulta pública. A quantidade de linhas não é usada como critério de corte.
+
+> **Nota de compatibilidade:** Mermaid evolui rápido. Um diagrama que funciona em Mermaid 11 pode falhar em ambientes que ainda usam Mermaid 10 ou versões customizadas. Antes de publicar em GitHub, GitLab, Obsidian, VS Code, Docusaurus, VitePress, MkDocs ou HTML próprio, teste no ambiente final.
 
 ---
 
 ## Sumário
 
-1. [Aula 1 — Entendendo o `stateDiagram` comando por comando](#aula-1--entendendo-o-statediagram-comando-por-comando)
-2. [Aula 2 — Tipos de personalização em `stateDiagram`](#aula-2--tipos-de-personalização-em-statediagram)
-3. [Aula 3 — Diagnóstico visual avançado do Mermaid dentro de uma página HTML local-first](#aula-3--diagnóstico-visual-avançado-do-mermaid-dentro-de-uma-página-html-local-first)
-4. [Aula 4 — Laboratório prático de personalizações em `stateDiagram`](#aula-4--laboratório-prático-de-personalizações-em-statediagram)
-5. [Aula 5 — Tabela definitiva de comandos e personalizações em `stateDiagram`](#aula-5--tabela-definitiva-de-comandos-e-personalizações-em-statediagram)
-6. [Aula 6 — Estudo específico do `badBadEvent`](#aula-6--estudo-específico-do-badbadevent)
-7. [Aula 7 — Como auditar e corrigir uma página HTML local-first com Markdown + Mermaid](#aula-7--como-auditar-e-corrigir-uma-página-html-local-first-com-markdown--mermaid)
-8. [Aula 8 — Checklist final de correção da página + modelo de patch CSS/JS](#aula-8--checklist-final-de-correção-da-página--modelo-de-patch-cssjs)
-9. [Referências oficiais](#referências-oficiais)
+1. [O que é Mermaid](#1-o-que-é-mermaid)
+2. [Quick Start](#2-quick-start)
+3. [Onde Mermaid roda](#3-onde-mermaid-roda)
+4. [Como escolher o tipo de diagrama](#4-como-escolher-o-tipo-de-diagrama)
+5. [Visão geral dos principais tipos de diagrama](#5-visão-geral-dos-principais-tipos-de-diagrama)
+6. [`stateDiagram-v2` — referência completa](#6-statediagram-v2--referência-completa)
+7. [Personalização visual: `classDef`, tema e CSS](#7-personalização-visual-classdef-tema-e-css)
+8. [Integração em Markdown, HTML e documentação](#8-integração-em-markdown-html-e-documentação)
+9. [Debugging e solução de problemas](#9-debugging-e-solução-de-problemas)
+10. [Acessibilidade](#10-acessibilidade)
+11. [Boas práticas para guia público](#11-boas-práticas-para-guia-público)
+12. [Checklist final de publicação](#12-checklist-final-de-publicação)
+13. [Referências e recursos](#13-referências-e-recursos)
+14. [Changelog editorial](#14-changelog-editorial)
 
 ---
 
-# Aula 1 — Entendendo o `stateDiagram` comando por comando
+# 1. O que é Mermaid
 
-Nesta aula, o ponto de partida foi o seguinte bloco Mermaid:
+Mermaid é uma ferramenta de **diagramas como código**. Em vez de desenhar manualmente caixas, setas e relacionamentos, você escreve uma descrição textual dentro de um bloco Markdown e o Mermaid renderiza essa descrição como SVG, PNG ou outro formato dependendo da ferramenta usada.
+
+Exemplo mental:
+
+```txt
+Código Mermaid
+   ↓
+Parser Mermaid
+   ↓
+Diagrama renderizado
+   ↓
+Documentação versionável em Git/Markdown
+```
+
+## 1.1 Para que serve
+
+Use Mermaid quando você precisa criar diagramas que sejam:
+
+| Objetivo | Por que Mermaid ajuda |
+|---|---|
+| Documentação técnica versionável | o diagrama fica em texto e pode ser revisado em Git |
+| READMEs e wikis | funciona em várias plataformas Markdown |
+| Arquitetura de software | descreve fluxos, classes, entidades e sequências |
+| Processos e regras de negócio | permite fluxogramas, estados, timelines e Gantt |
+| Materiais didáticos | facilita copiar, alterar, testar e explicar |
+
+## 1.2 Modelo mental essencial
+
+Todo diagrama começa com uma declaração de tipo:
+
+```txt
+flowchart TD
+sequenceDiagram
+classDiagram
+stateDiagram-v2
+erDiagram
+gantt
+pie
+mindmap
+timeline
+gitGraph
+```
+
+A declaração informa ao parser **qual gramática deve ser usada**. Um erro nessa primeira linha geralmente faz o diagrama inteiro falhar.
+
+---
+
+# 2. Quick Start
+
+## 2.1 Teste sem instalar nada
+
+A forma mais simples de começar é abrir o **Mermaid Live Editor**:
+
+```txt
+https://mermaid.live
+```
+
+Cole o exemplo abaixo:
+
+```mermaid
+flowchart TD
+    A[Escrever diagrama] --> B[Testar no Mermaid Live]
+    B --> C{Renderizou?}
+    C -->|Sim| D[Publicar no Markdown]
+    C -->|Não| E[Corrigir sintaxe]
+    E --> B
+```
+
+## 2.2 Usar em Markdown
+
+Em plataformas que renderizam Mermaid nativamente, use um bloco cercado com a linguagem `mermaid`:
 
 ````md
 ```mermaid
-stateDiagram
-direction TB
-
-accTitle: This is the accessible title
-accDescr: This is an accessible description
-
-classDef notMoving fill:white
-classDef movement font-style:italic
-classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
-
-[*]--> Still
-Still --> [*]
-Still --> Moving
-Moving --> Still
-Moving --> Crash
-Crash --> [*]
-
-class Still notMoving
-class Moving, Crash movement
-class Crash badBadEvent
-class end badBadEvent
+flowchart TD
+    A[Início] --> B[Fim]
 ```
 ````
 
-A documentação oficial do Mermaid confirma que `stateDiagram` aceita estados, transições, estado inicial/final com `[*]`, direção do diagrama, comentários, acessibilidade e estilização com `classDef`.
+## 2.3 Usar em HTML via CDN
 
-## 1. `stateDiagram`
-
-```mermaid
-stateDiagram
-```
-
-Esse comando diz ao Mermaid:
-
-> Renderize este bloco como um **diagrama de estados**.
-
-Um **diagrama de estados** representa situações possíveis de um sistema e como ele muda de uma situação para outra.
-
-| Estado | Significado |
-|---|---|
-| `Still` | parado |
-| `Moving` | em movimento |
-| `Crash` | colidiu |
-
-## 2. `direction TB`
-
-```mermaid
-direction TB
-```
-
-Define a direção visual do diagrama.
-
-`TB` significa:
-
-```txt
-Top to Bottom
-De cima para baixo
-```
-
-Principais opções:
-
-| Comando | Significado | Direção |
-|---|---|---|
-| `direction TB` | Top to Bottom | cima → baixo |
-| `direction BT` | Bottom to Top | baixo → cima |
-| `direction LR` | Left to Right | esquerda → direita |
-| `direction RL` | Right to Left | direita → esquerda |
-
-`direction` altera o **layout**, não a cor, a fonte ou o estilo visual.
-
-## 3. `accTitle`
-
-```mermaid
-accTitle: This is the accessible title
-```
-
-Define o **título acessível** do SVG gerado.
-
-Ele não muda a aparência visual. Serve para:
-
-- leitores de tela;
-- acessibilidade;
-- descrição semântica do SVG;
-- tecnologias assistivas.
-
-Na prática, pode gerar algo equivalente a:
+Para uma página HTML simples:
 
 ```html
-<title>This is the accessible title</title>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Mermaid Quick Start</title>
+</head>
+<body>
+  <pre class="mermaid">
+flowchart TD
+    A[Início] --> B[Fim]
+  </pre>
+
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: "default"
+    });
+
+    await mermaid.run({ querySelector: ".mermaid" });
+  </script>
+</body>
+</html>
 ```
 
-## 4. `accDescr`
+## 2.4 Usar via npm
 
-```mermaid
-accDescr: This is an accessible description
+```bash
+npm install mermaid
 ```
 
-Define a **descrição acessível** do diagrama.
+Uso típico em aplicação web:
 
-Também não muda a aparência visual. Pode gerar algo equivalente a:
+```js
+import mermaid from "mermaid";
 
-```html
-<desc>This is an accessible description</desc>
+mermaid.initialize({
+  startOnLoad: false,
+  theme: "default"
+});
+
+await mermaid.run({ querySelector: ".mermaid" });
 ```
 
-Também existe forma multilinha:
+## 2.5 Exportar via CLI
 
-```mermaid
-accDescr {
-Este diagrama mostra o ciclo entre Still, Moving e Crash.
-Ele também indica início e fim do fluxo.
-}
+Para gerar SVG/PNG/PDF em pipeline local ou CI/CD, use o Mermaid CLI:
+
+```bash
+npm install -g @mermaid-js/mermaid-cli
+mmdc -i diagrama.mmd -o diagrama.svg
 ```
 
-## 5. `classDef notMoving fill:white`
+---
 
-```mermaid
-classDef notMoving fill:white
-```
+# 3. Onde Mermaid roda
 
-`classDef` significa **definição de classe/estilo**.
+| Ambiente | Suporte | Observação prática |
+|---|---:|---|
+| Mermaid Live Editor | Nativo | melhor lugar para testar rapidamente |
+| GitHub | Nativo em blocos `mermaid` | bom para README, issues, PRs e wikis |
+| GitLab | Nativo em blocos `mermaid` | a versão suportada pode ficar atrás da versão oficial atual |
+| Obsidian | Suporte em Markdown | depende da versão do app e plugins/tema |
+| VS Code | Via extensões | a extensão define a versão Mermaid usada no preview |
+| Docusaurus | Via `@docusaurus/theme-mermaid` | adequado para documentação pública versionada |
+| VitePress | Via plugin/integração | exige configuração do bundler/documentação |
+| MkDocs Material | Integração com Mermaid | útil para docs técnicas em Python/Markdown |
+| HTML próprio | Via CDN/npm | você controla versão, CSS, segurança e renderização |
+| `marked`, `markdown-it`, `remark` | Via plugins ou pós-processamento | é preciso converter blocos `mermaid` em containers renderizáveis |
 
-Você cria uma classe chamada `notMoving` com a regra:
+> **Regra prática:** quando o guia for público, informe a versão Mermaid testada e liste os ambientes onde os exemplos foram validados.
 
-```css
-fill: white;
-```
+---
 
-No Mermaid, `fill` normalmente afeta o **fundo da forma**, isto é, o retângulo/caixa do estado.
+# 4. Como escolher o tipo de diagrama
 
-## 6. `classDef movement font-style:italic`
+A escolha correta do tipo de diagrama evita gambiarras. Antes de escrever o código, pergunte: **o que estou tentando comunicar?**
 
-```mermaid
-classDef movement font-style:italic
-```
-
-Cria a classe `movement`, com:
-
-```css
-font-style: italic;
-```
-
-Ou seja:
-
-> Todo estado com a classe `movement` deve ter texto em itálico.
-
-Aqui não há alteração de fundo, borda ou cor. Apenas estilo da fonte.
-
-## 7. `classDef badBadEvent ...`
-
-```mermaid
-classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
-```
-
-Cria a classe `badBadEvent` com múltiplas regras separadas por vírgula.
-
-| Trecho | Tipo | O que deveria fazer |
+| Quero comunicar... | Use | Por quê |
 |---|---|---|
-| `fill:#f00` | fundo | deixa o estado vermelho |
-| `color:white` | texto | deixa o texto branco |
-| `font-weight:bold` | texto | deixa o texto em negrito |
-| `stroke-width:2px` | borda | deixa a borda com 2px |
-| `stroke:yellow` | borda | deixa a borda amarela |
+| Processo, decisão, pipeline, arquitetura simples | `flowchart` | é o tipo mais flexível e mais usado |
+| Comunicação temporal entre atores/sistemas | `sequenceDiagram` | mostra ordem das mensagens no tempo |
+| Classes, métodos, herança, composição e dependências | `classDiagram` | mostra estrutura orientada a objetos ou contratos |
+| Ciclo de vida, máquina de estados, telas, status | `stateDiagram-v2` | mostra estados possíveis e transições válidas |
+| Modelo de dados relacional | `erDiagram` | mostra entidades, atributos e cardinalidade |
+| Cronograma, prazo e dependência temporal | `gantt` | mostra tarefas, duração, marcos e criticidade |
+| Percentuais simples | `pie` | comunica proporções rápidas |
+| Hierarquia de ideias | `mindmap` | organiza conceitos em árvore |
+| Evolução histórica ou marcos | `timeline` | mostra sequência cronológica |
+| Branches, commits e merges | `gitGraph` | documenta fluxo Git |
+| Jornada, experiência e satisfação | `journey` | mostra etapas do usuário e pontuação por persona |
+| Quadrantes de priorização | `quadrantChart` | útil para impacto/esforço, risco/valor etc. |
+| Série numérica em eixo X/Y | `xychart-beta` / `xychart` conforme ambiente | útil para gráficos simples em documentação |
+| Arquitetura cloud/CI/CD | `architecture` | mostra serviços, recursos e relações em implantação |
+| Kanban visual | `kanban` | mostra cartões por coluna/fase |
+| Radar/spider chart | `radar` | compara dimensões em formato polar |
+| Treemap, Venn, Ishikawa, TreeView | tipos específicos Mermaid 11+ | consulte a documentação oficial antes de publicar |
 
-Resultado visual esperado:
+> **Regra prática:** se você está em dúvida, comece por `flowchart`. Ele resolve a maior parte dos diagramas de processo, arquitetura e decisão. Use tipos mais especializados quando a semântica for importante.
 
-```txt
-┌─────────────────┐
-│ Crash em branco │  fundo vermelho
-└─────────────────┘  borda amarela
-```
+> **Cuidado de versão:** Mermaid 11.14.0 lista vários tipos modernos, como `quadrantChart`, `xychart`, `block`, `packet`, `kanban`, `architecture`, `radar`, `treemap`, `venn`, `ishikawa` e `treeView`. Ambientes como GitHub, GitLab, extensões de VS Code e plugins Markdown podem usar versões diferentes. Sempre teste no ambiente final.
 
-## 8. `[*]--> Still`
+---
 
-```mermaid
-[*]--> Still
-```
+# 5. Visão geral dos principais tipos de diagrama
 
-Cria uma transição do **estado inicial** para `Still`.
+Esta seção apresenta os principais tipos de diagrama Mermaid com exemplos práticos. O objetivo não é substituir a documentação oficial de cada sintaxe, mas dar ao leitor um ponto de partida real, copiável e suficientemente completo para escolher o tipo correto antes de aprofundar.
 
-`[*]` é um marcador especial. Quando aparece antes da seta:
+## 5.1 `flowchart` — fluxogramas
 
-```mermaid
-[*] --> Still
-```
+`flowchart` é provavelmente o tipo de diagrama mais usado no Mermaid. Ele serve para processos, decisões, pipelines, arquitetura de sistemas, documentação de fluxo de dados, rotinas operacionais, troubleshooting e visão geral de componentes.
 
-significa:
+A direção vem logo depois do tipo:
 
-```txt
-início do fluxo → Still
-```
-
-## 9. `Still --> [*]`
-
-```mermaid
-Still --> [*]
-```
-
-Quando `[*]` aparece depois da seta, representa o fim do fluxo:
-
-```txt
-Still → fim do fluxo
-```
-
-| Sintaxe | Significado |
-|---|---|
-| `[*] --> Still` | início |
-| `Still --> [*]` | fim |
-
-## 10. Transições entre estados
-
-```mermaid
-Still --> Moving
-Moving --> Still
-Moving --> Crash
-Crash --> [*]
-```
-
-Leitura:
-
-| Transição | Interpretação |
-|---|---|
-| `Still --> Moving` | sai de parado e entra em movimento |
-| `Moving --> Still` | sai de movimento e volta para parado |
-| `Moving --> Crash` | a colisão ocorre a partir do movimento |
-| `Crash --> [*]` | depois de `Crash`, o fluxo encerra |
-
-## 11. `class Still notMoving`
-
-```mermaid
-class Still notMoving
-```
-
-Aplica a classe `notMoving` ao estado `Still`.
-
-Como `notMoving` tem `fill:white`, `Still` deve receber fundo branco.
-
-Sintaxe mental:
-
-```txt
-class [estado] [classe]
-```
-
-## 12. `class Moving, Crash movement`
-
-```mermaid
-class Moving, Crash movement
-```
-
-Aplica a classe `movement` a `Moving` e `Crash`.
-
-Como `movement` tem `font-style:italic`, ambos deveriam ficar em itálico.
-
-Importante: uma classe não substitui necessariamente a outra. `Crash` pode receber mais de uma classe.
-
-## 13. `class Crash badBadEvent`
-
-```mermaid
-class Crash badBadEvent
-```
-
-Aplica `badBadEvent` ao estado `Crash`.
-
-Então `Crash` acumula:
-
-```css
-font-style: italic;
-fill: #f00;
-color: white;
-font-weight: bold;
-stroke-width: 2px;
-stroke: yellow;
-```
-
-| Propriedade | Resultado esperado em `Crash` |
-|---|---|
-| fundo | vermelho |
-| texto | branco |
-| texto | negrito |
-| texto | itálico |
-| borda | amarela |
-| borda | 2px |
-
-## 14. `class end badBadEvent`
-
-```mermaid
-class end badBadEvent
-```
-
-Essa linha **não significa** “aplique `badBadEvent` ao estado final”.
-
-Ela significa:
-
-> Aplique `badBadEvent` a um estado chamado literalmente `end`.
-
-Mas o estado final é:
-
-```mermaid
-[*]
-```
-
-Então essa linha é enganosa e provavelmente sem efeito útil no caso.
-
-Além disso, a documentação oficial informa limitações para aplicar `classDef` em estados de início/fim e estados compostos.
-
-## 15. Por que o texto de `Crash` deveria ficar branco?
-
-Por causa de:
-
-```mermaid
-classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
-class Crash badBadEvent
-```
-
-A lógica é:
-
-```txt
-O estado Crash recebe a classe badBadEvent.
-A classe badBadEvent define color:white.
-Logo, o texto de Crash deveria ficar branco.
-```
-
-## 16. Por que em uma página HTML o texto pode não ficar branco?
-
-Porque Mermaid transforma o bloco em SVG.
-
-O SVG final pode se parecer com:
-
-```html
-<g class="state badBadEvent">
-  <rect></rect>
-  <text>
-    <tspan>Crash</tspan>
-  </text>
-</g>
-```
-
-O problema ocorre se o CSS da página sobrescreve:
-
-```css
-text
-tspan
-.label
-.stateLabel
-.mermaid text
-```
-
-Exemplo perigoso:
-
-```css
-.mermaid text {
-  fill: #111;
-}
-```
-
-Em SVG, texto costuma ser pintado por `fill`, não apenas por `color`.
-
-## 17. Diferença essencial entre `fill`, `color` e `stroke`
-
-| Propriedade | Em HTML comum | Em SVG Mermaid |
+| Direção | Significado | Uso típico |
 |---|---|---|
-| `color` | cor do texto | pode afetar texto, mas nem sempre vence |
-| `fill` | geralmente não usado em texto comum | fundo de formas e também cor de texto SVG |
-| `stroke` | raro em HTML comum | borda/linha/contorno SVG |
-| `stroke-width` | raro em HTML comum | espessura da linha/borda SVG |
+| `TD` / `TB` | top-down / top-to-bottom | processos didáticos e fluxos verticais |
+| `LR` | left-to-right | pipeline, arquitetura e fluxo de dados |
+| `BT` | bottom-to-top | casos raros, leitura invertida |
+| `RL` | right-to-left | casos raros ou fluxos específicos |
 
-## 18. Modelo mental do problema
-
-```txt
-classDef badBadEvent
-        ↓
-Mermaid gera classes no SVG
-        ↓
-Sua página tem CSS global
-        ↓
-CSS global pode sobrescrever o texto
-        ↓
-Fundo fica vermelho, mas texto não fica branco
-```
-
-## 19. Três níveis de personalização
-
-### 19.1 Dentro do bloco Mermaid
+### 5.1.1 Exemplo mínimo
 
 ```mermaid
-classDef danger fill:#f00,color:#fff,stroke:#ff0,stroke-width:2px
-class Crash danger
+flowchart TD
+    A[Receber solicitação] --> B{Está completa?}
+    B -->|Sim| C[Processar]
+    B -->|Não| D[Solicitar ajuste]
+    D --> A
+    C --> E[Finalizar]
 ```
 
-Vantagens:
+### 5.1.2 Formas de nó mais usadas
 
-- portátil;
-- funciona em GitHub/StackEdit/Mermaid Live;
-- fica junto do diagrama.
-
-Limitações:
-
-- pode ser sobrescrito pelo CSS da página;
-- pode não controlar todos os detalhes do SVG final;
-- tem limitações em início/fim e estados compostos.
-
-### 19.2 Por tema/configuração Mermaid
-
-```mermaid
----
-config:
-  theme: base
-  themeVariables:
-    primaryColor: "#ffffff"
-    primaryTextColor: "#111111"
-    lineColor: "#333333"
----
-stateDiagram
-    [*] --> Still
-```
-
-`themeVariables` é indicado principalmente com `theme: base`.
-
-### 19.3 Por CSS externo da página
-
-```css
-.mermaid svg .badBadEvent rect {
-  fill: #f00 !important;
-  stroke: yellow !important;
-  stroke-width: 2px !important;
-}
-
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .stateLabel {
-  fill: #fff !important;
-  color: #fff !important;
-  font-weight: 700 !important;
-}
-```
-
-Esse nível é útil para página HTML local-first, mas deve ser usado com cuidado.
-
-## 20. Diretivas antigas
-
-Exemplo antigo:
-
-```mermaid
-%%{init: { "theme": "forest" } }%%
-stateDiagram
-    [*] --> Still
-```
-
-A documentação atual recomenda `config` por frontmatter:
-
-```mermaid
----
-config:
-  theme: forest
----
-stateDiagram
-    [*] --> Still
-```
-
-## 21. Diagnóstico esperado do exemplo
-
-| Estado | Classe aplicada | Resultado esperado |
+| Sintaxe | Forma visual | Uso comum |
 |---|---|---|
-| `Still` | `notMoving` | fundo branco |
-| `Moving` | `movement` | texto itálico |
-| `Crash` | `movement` + `badBadEvent` | fundo vermelho, texto branco, negrito, itálico, borda amarela |
-| `[*]` inicial/final | nenhuma classe real aplicada | estilo padrão |
-| `end` | tenta aplicar, mas não existe como estado visível | sem efeito prático |
+| `A[Texto]` | retângulo | ação, etapa, componente comum |
+| `A(Texto)` | retângulo arredondado | início/fim leve, etapa amigável |
+| `A{Texto}` | losango | decisão, condição, bifurcação |
+| `A((Texto))` | círculo | evento, alerta, conector |
+| `A[(Texto)]` | cilindro | banco de dados, storage, cache |
+| `A[/Texto/]` | paralelogramo | entrada/saída, relatório, payload |
+| `A[[Texto]]` | subrotina | processo reutilizável |
+| `A>Texto]` | assimétrico | marcador especial ou etapa destacada |
 
-## 22. Regra de ouro
+Exemplo com formas práticas:
 
-Não basta procurar:
-
-```css
-.badBadEvent {
-  color: white;
-}
+```mermaid
+flowchart TD
+    A[(Banco de dados)] --> B[Processamento]
+    B --> C{Resultado?}
+    C -->|OK| D[/Saída/]
+    C -->|Erro| E((Alertar))
 ```
 
-Também é necessário verificar:
+### 5.1.3 Rótulos em setas com `|texto|`
 
-```css
-.mermaid text
-.mermaid tspan
-.mermaid .label
-.mermaid .stateLabel
-.markdown-body .mermaid text
-.prose .mermaid text
-svg text
-svg tspan
+Use `|texto|` para explicar a condição, evento ou significado da transição.
+
+```mermaid
+flowchart TD
+    Login[Usuário informa credenciais] --> Validar{Credenciais válidas?}
+    Validar -->|Sim| Token[Gerar token]
+    Validar -->|Não| Erro[Exibir erro]
+    Token --> Dashboard[Abrir dashboard]
+    Erro --> Login
 ```
 
-Correção defensiva possível:
+Boas práticas para rótulos:
 
-```css
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .stateLabel {
-  fill: #fff !important;
-  color: #fff !important;
-}
+| Faça | Evite |
+|---|---|
+| `-->|Sim|` e `-->|Não|` em decisões | deixar setas saindo de losango sem rótulo |
+| rótulos curtos: `200 OK`, `timeout`, `cache miss` | frases longas que entortam o layout |
+| rótulos técnicos quando o público é técnico | esconder protocolo/status importante |
+
+### 5.1.4 Tipos de seta e linha
+
+| Sintaxe | Leitura prática |
+|---|---|
+| `A --> B` | fluxo direcional padrão |
+| `A --- B` | relação sem direção forte |
+| `A -.-> B` | dependência, fallback, caminho indireto |
+| `A ==> B` | fluxo forte/importante |
+| `A -- texto --> B` | seta com texto alternativo |
+| `A -->|texto| B` | seta rotulada mais legível |
+
+```mermaid
+flowchart LR
+    Cliente --> API
+    API --> Banco[(PostgreSQL)]
+    API -.-> Cache[(Redis)]
+    API ==> Fila[[Fila de eventos]]
+    Fila --> Worker[Worker assíncrono]
 ```
 
-## Resumo mental da Aula 1
+### 5.1.5 `subgraph` — agrupando arquitetura e responsabilidades
 
-```txt
-stateDiagram
-  ↓
-declara o tipo do diagrama
+`subgraph` é essencial para diagramas de arquitetura, porque separa fronteiras: cliente, front-end, back-end, dados, observabilidade, rede, cloud etc.
 
-direction TB
-  ↓
-define direção visual
+```mermaid
+flowchart LR
+    subgraph Cliente
+        Browser[Navegador]
+    end
 
-accTitle / accDescr
-  ↓
-acessibilidade do SVG, não aparência
+    subgraph Frontend
+        SPA[Aplicação SPA]
+        CDN[CDN / Assets]
+    end
 
-classDef
-  ↓
-cria estilo nomeado
+    subgraph Backend
+        API[API REST]
+        Auth[Serviço de autenticação]
+        Worker[Worker]
+    end
 
-class Estado Classe
-  ↓
-aplica estilo ao estado
+    subgraph Dados
+        DB[(PostgreSQL)]
+        Cache[(Redis)]
+    end
 
-[*]
-  ↓
-início ou fim especial
+    Browser --> CDN
+    Browser --> SPA
+    SPA -->|HTTPS / JSON| API
+    API --> Auth
+    API --> DB
+    API --> Cache
+    API --> Worker
+    Worker --> DB
+```
 
-class end badBadEvent
-  ↓
-não estiliza o [*]; tenta estilizar um estado chamado end
+#### Subgraph com direção interna
 
-color:white
-  ↓
-intenção correta para texto branco
+```mermaid
+flowchart LR
+    subgraph Pipeline CI/CD
+      direction TB
+      Commit[Commit] --> Build[Build]
+      Build --> Test[Testes]
+      Test --> Deploy[Deploy]
+    end
 
-mas em SVG
-  ↓
-às vezes precisa vencer fill em text/tspan
+    Dev[Desenvolvedor] --> Commit
+    Deploy --> Prod[Produção]
+```
+
+### 5.1.6 Estilizando nós com `classDef`
+
+```mermaid
+flowchart TD
+    classDef entrada fill:#e0f2fe,color:#075985,stroke:#0284c7,stroke-width:2px
+    classDef decisao fill:#fef3c7,color:#92400e,stroke:#f59e0b,stroke-width:2px
+    classDef erro fill:#fee2e2,color:#991b1b,stroke:#ef4444,stroke-width:2px,font-weight:bold
+    classDef sucesso fill:#dcfce7,color:#166534,stroke:#22c55e,stroke-width:2px
+
+    A[/Payload recebido/] --> B{JSON válido?}
+    B -->|Sim| C[Persistir dados]
+    B -->|Não| D[Retornar 400]
+    C --> E[Retornar 201]
+
+    class A entrada
+    class B decisao
+    class D erro
+    class E sucesso
+```
+
+### 5.1.7 `linkStyle` — estilizando setas individualmente
+
+`linkStyle` estiliza arestas pelo índice da seta, começando em `0`, na ordem em que as conexões aparecem no código. É poderoso, mas exige cuidado: se você inserir uma seta antes, os índices mudam.
+
+```mermaid
+flowchart TD
+    A[Receber pedido] --> B{Estoque disponível?}
+    B -->|Sim| C[Reservar estoque]
+    B -->|Não| D[Notificar indisponibilidade]
+    C --> E[Emitir nota]
+    D --> F[Encerrar fluxo]
+
+    linkStyle 1 stroke:#16a34a,stroke-width:3px
+    linkStyle 2 stroke:#dc2626,stroke-width:3px,stroke-dasharray:5 5
+```
+
+Leitura do índice acima:
+
+| Índice | Aresta |
+|---:|---|
+| `0` | `A --> B` |
+| `1` | `B --> C` |
+| `2` | `B --> D` |
+| `3` | `C --> E` |
+| `4` | `D --> F` |
+
+### 5.1.8 Exemplo real: fluxo de login com cache, banco e auditoria
+
+```mermaid
+flowchart LR
+    classDef client fill:#e0f2fe,color:#075985,stroke:#0284c7,stroke-width:2px
+    classDef app fill:#eef2ff,color:#312e81,stroke:#6366f1,stroke-width:2px
+    classDef data fill:#f0fdf4,color:#166534,stroke:#22c55e,stroke-width:2px
+    classDef decision fill:#fef3c7,color:#92400e,stroke:#f59e0b,stroke-width:2px
+    classDef error fill:#fee2e2,color:#991b1b,stroke:#ef4444,stroke-width:2px,font-weight:bold
+
+    Browser[Browser] -->|POST /login| API[API]
+    API --> Cache[(Redis)]
+    Cache -->|cache hit| Token[Emitir token]
+    Cache -->|cache miss| DB[(Banco de usuários)]
+    DB --> Validar{Senha válida?}
+    Validar -->|Sim| Token
+    Validar -->|Não| Falha[Retornar 401]
+    Token --> Audit[/Registrar auditoria/]
+    Falha --> Audit
+
+    class Browser client
+    class API,Token app
+    class Cache,DB data
+    class Validar decision
+    class Falha error
+```
+
+### 5.1.9 Pegadinhas clássicas de `flowchart`
+
+| Pegadinha | Como evitar |
+|---|---|
+| usar `end` minúsculo como texto/ID | escreva `End`, `END` ou use outro ID |
+| nó começando com `o` ou `x` após certos conectores | insira espaço ou use maiúscula para não virar marcador especial |
+| texto muito longo no nó | use rótulo curto + nota textual fora do diagrama |
+| `linkStyle` quebrar depois de inserir nova seta | revise índices após qualquer alteração estrutural |
+| subgraphs enormes | divida por fronteiras lógicas e use direção interna |
+
+## 5.2 `sequenceDiagram` — sequência de mensagens
+
+`sequenceDiagram` mostra **quem fala com quem e em qual ordem temporal**. É excelente para documentar protocolo, autenticação, checkout, troca de mensagens entre microserviços, eventos assíncronos e comportamento de APIs.
+
+### 5.2.1 Exemplo básico
+
+```mermaid
+sequenceDiagram
+    actor Usuario
+    participant Frontend
+    participant API
+    participant Banco
+
+    Usuario->>Frontend: Envia login
+    Frontend->>API: POST /login
+    API->>Banco: Consulta credenciais
+    Banco-->>API: Resultado
+    API-->>Frontend: Token ou erro
+    Frontend-->>Usuario: Exibe resposta
+```
+
+### 5.2.2 Participantes, atores e aliases
+
+```mermaid
+sequenceDiagram
+    actor U as Usuário
+    participant FE as Front-end
+    participant API as API de autenticação
+    database DB as Banco de usuários
+
+    U->>FE: Informa credenciais
+    FE->>API: POST /login
+    API->>DB: SELECT usuário
+    DB-->>API: Dados do usuário
+    API-->>FE: Resposta
+```
+
+Use aliases quando o nome técnico for curto, mas o rótulo visual precisar ser claro.
+
+### 5.2.3 Tipos de mensagem
+
+| Sintaxe | Interpretação comum |
+|---|---|
+| `A->>B: msg` | chamada síncrona/forte |
+| `A-->>B: msg` | resposta/retorno |
+| `A-)B: msg` | mensagem assíncrona |
+| `A--xB: msg` | falha, perda, encerramento ou rejeição |
+| `A->>+B: msg` | ativa linha de vida de `B` |
+| `B-->>-A: msg` | retorna e desativa linha de vida de `B` |
+
+### 5.2.4 `activate` e `deactivate`
+
+Use ativação para mostrar que um serviço está processando algo durante certo intervalo.
+
+```mermaid
+sequenceDiagram
+    participant FE as Front-end
+    participant API
+    participant DB as Banco
+
+    FE->>API: GET /pedidos
+    activate API
+    API->>DB: Buscar pedidos
+    activate DB
+    DB-->>API: Lista de pedidos
+    deactivate DB
+    API-->>FE: 200 OK + JSON
+    deactivate API
+```
+
+Forma compacta equivalente:
+
+```mermaid
+sequenceDiagram
+    participant FE as Front-end
+    participant API
+    participant DB as Banco
+
+    FE->>+API: GET /pedidos
+    API->>+DB: Buscar pedidos
+    DB-->>-API: Lista de pedidos
+    API-->>-FE: 200 OK + JSON
+```
+
+### 5.2.5 `alt`, `else` e `opt` — condicionais
+
+`alt` representa caminhos alternativos. `opt` representa um bloco opcional.
+
+```mermaid
+sequenceDiagram
+    actor U as Usuário
+    participant FE as Front-end
+    participant API
+    participant DB as Banco
+
+    U->>FE: Envia login
+    FE->>API: POST /login
+    API->>DB: Validar credenciais
+    DB-->>API: Resultado
+
+    alt credenciais válidas
+        API-->>FE: 200 OK + token
+        FE-->>U: Abrir dashboard
+    else credenciais inválidas
+        API-->>FE: 401 Unauthorized
+        FE-->>U: Exibir erro
+    end
+
+    opt MFA habilitado
+        FE->>API: POST /mfa/verify
+        API-->>FE: MFA aprovado
+    end
+```
+
+### 5.2.6 `loop` — repetição
+
+```mermaid
+sequenceDiagram
+    participant Worker
+    participant Queue as Fila
+    participant API
+
+    loop enquanto houver mensagens
+        Worker->>Queue: Consumir mensagem
+        Queue-->>Worker: Evento
+        Worker->>API: Processar evento
+        API-->>Worker: Resultado
+    end
+```
+
+### 5.2.7 `par` — ações paralelas
+
+```mermaid
+sequenceDiagram
+    participant API
+    participant Email
+    participant Audit as Auditoria
+    participant Metrics as Métricas
+
+    API->>API: Pedido confirmado
+
+    par notificações
+        API->>Email: Enviar e-mail
+    and auditoria
+        API->>Audit: Registrar evento
+    and métricas
+        API->>Metrics: Incrementar contador
+    end
+```
+
+### 5.2.8 `note over`, `note left of` e `note right of`
+
+```mermaid
+sequenceDiagram
+    participant Cliente
+    participant API
+    participant DB as Banco
+
+    Cliente->>API: POST /checkout
+    note over Cliente,API: Requisição HTTPS com payload JSON
+    API->>DB: Criar pedido
+    note right of DB: Transação deve ser atômica
+    DB-->>API: Pedido criado
+    API-->>Cliente: 201 Created
+```
+
+### 5.2.9 `autonumber`
+
+`autonumber` numera automaticamente as mensagens. É muito útil em documentação de protocolo, troubleshooting e auditoria.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuário
+    participant FE as Front-end
+    participant API
+    participant DB as Banco
+
+    U->>FE: Envia login
+    FE->>API: POST /login
+    API->>DB: Validar credenciais
+    DB-->>API: OK
+    API-->>FE: Token JWT
+    FE-->>U: Dashboard
+```
+
+### 5.2.10 Exemplo real: login com cache, banco, MFA e auditoria
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor U as Usuário
+    participant FE as Front-end
+    participant API as API Auth
+    participant Cache as Redis
+    participant DB as Banco
+    participant MFA as Serviço MFA
+    participant Audit as Auditoria
+
+    U->>FE: Informar e-mail e senha
+    FE->>+API: POST /login
+    API->>Cache: Buscar tentativa recente
+
+    alt usuário bloqueado temporariamente
+        Cache-->>API: Bloqueado
+        API-->>-FE: 429 Too Many Requests
+        FE-->>U: Exibir bloqueio temporário
+    else usuário pode tentar login
+        Cache-->>API: Sem bloqueio
+        API->>+DB: Consultar usuário
+        DB-->>-API: Hash da senha e flags
+
+        alt senha inválida
+            API->>Cache: Incrementar tentativas
+            API->>Audit: Registrar falha
+            API-->>FE: 401 Unauthorized
+            FE-->>U: Exibir erro
+        else senha válida
+            opt MFA habilitado
+                API->>+MFA: Solicitar validação
+                MFA-->>-API: MFA aprovado
+            end
+
+            par pós-login
+                API->>Audit: Registrar sucesso
+            and sessão
+                API->>Cache: Armazenar sessão
+            end
+
+            API-->>FE: 200 OK + token
+            FE-->>U: Abrir dashboard
+        end
+        deactivate API
+    end
+```
+
+### 5.2.11 Quando o diagrama de sequência fica ruim
+
+| Sintoma | Correção |
+|---|---|
+| muitos participantes | agrupe serviços ou divida em diagramas menores |
+| muitas mensagens de baixo nível | esconda detalhes internos sem valor para o leitor |
+| condicionais aninhadas demais | considere `stateDiagram-v2` para lógica de estados |
+| setas cruzadas/confusas | reorganize a ordem dos participantes |
+| texto de mensagem enorme | use mensagem curta e explique fora do diagrama |
+
+## 5.3 `classDiagram` — classes e relacionamentos
+
+`classDiagram` documenta estrutura: classes, atributos, métodos e relações. Ele é útil para OO, contratos de domínio, modelagem conceitual e comunicação entre devs.
+
+### 5.3.1 Exemplo básico
+
+```mermaid
+classDiagram
+    class Usuario {
+      +string nome
+      +string email
+      +autenticar()
+    }
+
+    class Pedido {
+      +int id
+      +decimal total
+      +fechar()
+    }
+
+    Usuario "1" --> "0..*" Pedido : cria
+```
+
+### 5.3.2 Visibilidade de membros
+
+| Símbolo | Significado usual |
+|---|---|
+| `+` | público |
+| `-` | privado |
+| `#` | protegido |
+| `~` | pacote/internal |
+
+```mermaid
+classDiagram
+    class ContaBancaria {
+      -decimal saldo
+      +depositar(decimal valor)
+      +sacar(decimal valor)
+      #validarSaldo(decimal valor)
+    }
+```
+
+### 5.3.3 Tipos de relacionamento
+
+| Notação | Nome | Leitura prática |
+|---|---|---|
+| `<|--` | herança/generalização | `Cachorro` é um `Animal` |
+| `*--` | composição | parte depende fortemente do todo |
+| `o--` | agregação | parte pertence ao todo, mas pode existir fora dele |
+| `-->` | associação | uma classe conhece/usa a outra |
+| `..>` | dependência | uso pontual, parâmetro, retorno, chamada |
+| `--` | link simples | relação genérica sem direção forte |
+| `..|>` | realização/interface | classe implementa interface |
+
+```mermaid
+classDiagram
+    Animal <|-- Cachorro
+    Animal <|-- Gato
+    Pedido *-- ItemPedido
+    Time o-- Jogador
+    ControladorPedido --> PedidoService
+    PedidoService ..> EmailService
+    Pessoa -- Endereco
+
+    class Animal {
+      +string nome
+      +emitirSom()
+    }
+
+    class Cachorro {
+      +latir()
+    }
+
+    class Gato {
+      +miar()
+    }
+
+    class Pedido {
+      +int id
+      +fechar()
+    }
+
+    class ItemPedido {
+      +int quantidade
+      +decimal subtotal
+    }
+```
+
+### 5.3.4 Cardinalidade e rótulo
+
+```mermaid
+classDiagram
+    Cliente "1" --> "0..*" Pedido : realiza
+    Pedido "1" *-- "1..*" ItemPedido : contém
+    Produto "1" --> "0..*" ItemPedido : vendido em
+```
+
+| Cardinalidade | Significado |
+|---|---|
+| `1` | exatamente um |
+| `0..1` | zero ou um |
+| `0..*` | zero ou muitos |
+| `1..*` | um ou muitos |
+| `n` | quantidade específica/conceitual |
+
+### 5.3.5 Interface e implementação
+
+```mermaid
+classDiagram
+    class RepositorioUsuario {
+      <<interface>>
+      +buscarPorEmail(string email) Usuario
+      +salvar(Usuario usuario)
+    }
+
+    class RepositorioUsuarioPostgres {
+      +buscarPorEmail(string email) Usuario
+      +salvar(Usuario usuario)
+    }
+
+    RepositorioUsuario <|.. RepositorioUsuarioPostgres
+```
+
+### 5.3.6 Exemplo real: domínio de pedido
+
+```mermaid
+classDiagram
+    class Cliente {
+      +uuid id
+      +string nome
+      +string email
+      +criarPedido()
+    }
+
+    class Pedido {
+      +uuid id
+      +PedidoStatus status
+      +decimal total
+      +adicionarItem(Produto produto, int quantidade)
+      +fechar()
+      +cancelar()
+    }
+
+    class ItemPedido {
+      +int quantidade
+      +decimal precoUnitario
+      +subtotal()
+    }
+
+    class Produto {
+      +uuid id
+      +string nome
+      +decimal preco
+      +bool ativo
+    }
+
+    class Pagamento {
+      +uuid id
+      +decimal valor
+      +autorizar()
+      +estornar()
+    }
+
+    class PedidoStatus {
+      <<enumeration>>
+      RASCUNHO
+      FECHADO
+      PAGO
+      CANCELADO
+    }
+
+    Cliente "1" --> "0..*" Pedido : realiza
+    Pedido "1" *-- "1..*" ItemPedido : contém
+    ItemPedido "*" --> "1" Produto : referencia
+    Pedido "1" o-- "0..1" Pagamento : pagamento
+    Pedido --> PedidoStatus : estado
+```
+
+### 5.3.7 Diferença prática entre associação, agregação e composição
+
+| Relação | Pergunta de decisão | Exemplo |
+|---|---|---|
+| Associação `-->` | “uma classe conhece/usa a outra?” | `PedidoService --> PedidoRepository` |
+| Agregação `o--` | “a parte pode viver sem o todo?” | `Time o-- Jogador` |
+| Composição `*--` | “a parte morre com o todo?” | `Pedido *-- ItemPedido` |
+
+Quando estiver em dúvida, prefira associação simples. Use composição/agregação quando a semântica de ciclo de vida for realmente importante.
+
+## 5.4 `stateDiagram-v2` — estados e transições
+
+Use para comportamento de sistemas com estados finitos.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Loading: iniciar
+    Loading --> Success: resposta 200
+    Loading --> Error: falha
+    Error --> Idle: tentar novamente
+    Success --> [*]
+```
+
+Este guia aprofunda esse tipo a partir da seção [6](#6-statediagram-v2--referência-completa).
+
+## 5.5 `erDiagram` — entidade-relacionamento
+
+Use para modelagem de dados.
+
+```mermaid
+erDiagram
+    CLIENTE ||--o{ PEDIDO : realiza
+    PEDIDO ||--|{ ITEM_PEDIDO : contém
+    PRODUTO ||--o{ ITEM_PEDIDO : compõe
+
+    CLIENTE {
+      int id
+      string nome
+      string email
+    }
+
+    PEDIDO {
+      int id
+      date criado_em
+      decimal total
+    }
+```
+
+
+### 5.5.1 Notação de cardinalidade em `erDiagram`
+
+A cardinalidade aparece nas duas pontas da relação. Cada marcador combina **mínimo** e **máximo** de ocorrência.
+
+| Marcador | Leitura | Modelo mental |
+|---|---|---|
+| `||` | exatamente um | obrigatório e único |
+| `|o` / `o|` | zero ou um | opcional, no máximo um |
+| `|{` / `}|` | um ou muitos | obrigatório, pode repetir |
+| `o{` / `}o` | zero ou muitos | opcional, pode repetir |
+
+Exemplo de leitura:
+
+```mermaid
+erDiagram
+    CLIENTE ||--o{ PEDIDO : realiza
+    PEDIDO ||--|{ ITEM_PEDIDO : contém
+    PRODUTO ||--o{ ITEM_PEDIDO : aparece_em
+```
+
+Como interpretar:
+
+| Relação | Leitura prática |
+|---|---|
+| `CLIENTE ||--o{ PEDIDO` | um cliente pode realizar zero ou muitos pedidos; cada pedido pertence a exatamente um cliente |
+| `PEDIDO ||--|{ ITEM_PEDIDO` | um pedido contém um ou muitos itens; cada item pertence a exatamente um pedido |
+| `PRODUTO ||--o{ ITEM_PEDIDO` | um produto pode aparecer em zero ou muitos itens de pedido; cada item referencia exatamente um produto |
+
+Além da cardinalidade, a linha também indica se a relação é **identificadora** ou **não identificadora**:
+
+| Linha | Tipo | Uso |
+|---|---|---|
+| `--` | identificadora / sólida | quando a entidade dependente não existe sem a entidade principal |
+| `..` | não identificadora / tracejada | quando as entidades podem existir de forma mais independente |
+
+## 5.6 `gantt` — cronogramas
+
+Use `gantt` para planejamento de atividades, dependências temporais, marcos, status e criticidade.
+
+```mermaid
+gantt
+    title Implantação de documentação Mermaid
+    dateFormat  YYYY-MM-DD
+
+    section Preparação
+    Revisar guia antigo      :done,    a1, 2026-05-01, 2d
+    Definir escopo público   :active,  a2, after a1, 2d
+
+    section Publicação
+    Escrever guia revisado   :crit,    b1, after a2, 3d
+    Validar exemplos         :         b2, after b1, 1d
+    Publicar versão final    :milestone, m1, after b2, 0d
+```
+
+Tags úteis:
+
+| Tag | Significado prático |
+|---|---|
+| `done` | tarefa concluída |
+| `active` | tarefa em andamento |
+| `crit` | tarefa crítica; atraso impacta o cronograma |
+| `milestone` | marco, entrega ou ponto de controle |
+
+Exemplo com dependência explícita:
+
+```mermaid
+gantt
+    title Release de documentação técnica
+    dateFormat YYYY-MM-DD
+    excludes weekends
+
+    section Conteúdo
+    Levantamento          :done,    t1, 2026-05-01, 2d
+    Escrita técnica       :crit,    t2, after t1, 4d
+    Revisão por pares     :active,  t3, after t2, 2d
+
+    section Publicação
+    Ajustes finais        :crit,    t4, after t3, 1d
+    Deploy da documentação:milestone, t5, after t4, 0d
+```
+
+Boas práticas:
+
+| Faça | Evite |
+|---|---|
+| use IDs (`t1`, `t2`) para dependências | depender só da ordem visual |
+| marque `crit` para tarefas críticas | tratar todas as tarefas como iguais |
+| use `milestone` para entregas | representar entrega como tarefa longa |
+| teste datas e exclusões no ambiente final | assumir que toda plataforma usa mesma versão Mermaid |
+
+## 5.7 `pie` — gráfico de pizza
+
+Use para percentuais simples e distribuição proporcional.
+
+```mermaid
+pie showData
+    title Tipos de uso do Mermaid em documentação
+    "Fluxogramas" : 45
+    "Sequência" : 25
+    "Estados" : 20
+    "Outros" : 10
+```
+
+## 5.8 `mindmap` — mapa mental
+
+Use para hierarquias conceituais.
+
+```mermaid
+mindmap
+  root((Mermaid))
+    Sintaxe
+      flowchart
+      sequenceDiagram
+      stateDiagram-v2
+    Integração
+      GitHub
+      GitLab
+      HTML
+    Qualidade
+      Acessibilidade
+      Debugging
+      Versionamento
+```
+
+## 5.9 `timeline` — linha do tempo
+
+Use para evolução histórica, releases, marcos e fases.
+
+```mermaid
+timeline
+    title Evolução de um guia Mermaid
+    2026-05-01 : Conteúdo em formato de aulas
+    2026-05-05 : Consolidação de exemplos
+    2026-05-10 : Revisão para guia público
+```
+
+## 5.10 `gitGraph` — histórico Git
+
+Use para explicar branches, merges e fluxo de entrega.
+
+```mermaid
+gitGraph
+    commit id: "init"
+    branch develop
+    checkout develop
+    commit id: "docs"
+    commit id: "review"
+    checkout main
+    merge develop id: "release"
+```
+
+## 5.11 `journey` — jornada do usuário
+
+Use para representar etapas de experiência e satisfação.
+
+```mermaid
+journey
+    title Jornada de leitura de um guia público
+    section Descoberta
+      Encontra o guia: 4: Leitor
+      Lê o Quick Start: 5: Leitor
+    section Uso
+      Copia exemplo: 5: Leitor
+      Corrige erro de sintaxe: 3: Leitor
+      Publica diagrama: 5: Leitor
 ```
 
 ---
 
-# Aula 2 — Tipos de personalização em `stateDiagram`
+# 6. `stateDiagram-v2` — referência completa
 
-Nesta etapa, a personalização foi separada em **camadas**, porque nem tudo é feito com `classDef`.
+## 6.1 Quando usar
 
-A documentação oficial do Mermaid para `stateDiagram` confirma suporte a estados, transições, start/end, estados compostos, choice, fork/join, notes, concurrency, direção, comentários e estilização com `classDef`.
+Use `stateDiagram-v2` quando o foco é mostrar **em qual estado um sistema pode estar** e **quais eventos ou condições fazem esse sistema mudar de estado**.
 
-## 1. Personalização estrutural
+Bons casos:
 
-Aqui você muda **como o diagrama é construído**, não necessariamente as cores.
+| Caso | Exemplo |
+|---|---|
+| Interface | `Idle`, `Loading`, `Success`, `Error` |
+| Pedido | `Criado`, `Pago`, `Enviado`, `Cancelado` |
+| Autenticação | `Anonimo`, `Logado`, `Bloqueado` |
+| Máquina de estados | `Parado`, `EmMovimento`, `Falha` |
+| Workflow | `Rascunho`, `EmRevisao`, `Aprovado`, `Publicado` |
 
-### 1.1 Estado simples
+## 6.2 `stateDiagram` vs `stateDiagram-v2`
+
+A recomendação prática para diagramas novos é usar:
+
+```txt
+stateDiagram-v2
+```
+
+Diferença conceitual:
+
+| Sintaxe | Situação prática |
+|---|---|
+| `stateDiagram-v2` | renderer/sintaxe atual para novos diagramas de estado; melhor escolha para documentação nova |
+| `stateDiagram` | forma antiga/legada ainda aceita em muitos ambientes; pode aparecer em exemplos antigos |
+
+Diferenças práticas importantes:
+
+| Ponto | `stateDiagram` legado | `stateDiagram-v2` atual |
+|---|---|---|
+| Renderer | associado a implementação antiga | renderer atual para diagramas de estado |
+| Consistência visual | pode variar mais entre versões | tende a ser mais previsível em versões recentes |
+| `classDef` em estados simples | pode funcionar, mas com mais inconsistência histórica | melhor suporte em estados simples |
+| Estados compostos | suportados, mas com limitações de estilo | sintaxe mais consistente, embora estilos em compostos ainda exijam cuidado |
+| Material novo | use apenas se precisa compatibilidade com ambiente antigo | preferível para guias públicos atuais |
+
+> **Regra de ouro:** use `stateDiagram-v2` no material novo, mas saiba ler `stateDiagram` porque muitos READMEs, respostas antigas e exemplos na internet ainda usam a forma legada.
+
+> **Atenção:** mesmo em `stateDiagram-v2`, `[*]` não deve ser tratado como estado comum para `classDef`, e estados compostos continuam exigindo testes no ambiente final.
+
+## 6.3 Estrutura mínima
 
 ```mermaid
-stateDiagram
+stateDiagram-v2
     [*] --> Still
     Still --> Moving
     Moving --> Crash
     Crash --> [*]
 ```
 
-`Still`, `Moving` e `Crash` são IDs de estados. Se um estado aparece em uma transição e ainda não foi declarado antes, o Mermaid cria esse estado automaticamente.
-
-### 1.2 Estado com nome visual diferente do ID
-
-Forma 1:
-
-```mermaid
-stateDiagram
-    state "Usuário parado" as Still
-    [*] --> Still
-```
-
-Forma 2:
-
-```mermaid
-stateDiagram
-    Still: Usuário parado
-    [*] --> Still
-```
-
-| Parte | Função |
-|---|---|
-| `Still` | ID interno usado nas transições |
-| `Usuário parado` | texto exibido na tela |
-
-Isso é útil quando o texto visual precisa ter espaço, acento, frase longa ou rótulo mais didático.
-
-## 2. Personalização de fluxo
-
-Aqui você muda **a leitura lógica** do diagrama.
-
-### 2.1 Transição simples
-
-```mermaid
-stateDiagram
-    Still --> Moving
-```
-
-Lê-se:
+Leitura:
 
 ```txt
-Still vai para Moving
+início → Still → Moving → Crash → fim
 ```
 
-### 2.2 Transição com rótulo
+## 6.4 Estado inicial e final
 
 ```mermaid
-stateDiagram
-    Still --> Moving: start
-    Moving --> Still: stop
-```
-
-O texto depois dos dois-pontos vira o **rótulo da seta**.
-
-### 2.3 Estado inicial e final
-
-```mermaid
-stateDiagram
-    [*] --> Still
-    Still --> [*]
+stateDiagram-v2
+    [*] --> Aguardando
+    Aguardando --> [*]
 ```
 
 | Sintaxe | Significado |
 |---|---|
-| `[*] --> Still` | início |
-| `Still --> [*]` | fim |
+| `[*] --> Estado` | início do fluxo |
+| `Estado --> [*]` | fim do fluxo |
 
-`[*]` é sintaxe especial para start/stop states.
+`[*]` é marcador especial. Ele não deve ser tratado como um estado comum.
 
-## 3. Personalização de direção/layout
-
-```mermaid
-stateDiagram
-    direction TB
-    [*] --> A
-    A --> B
-    B --> C
-```
-
-| Comando | Significado | Resultado mental |
-|---|---|---|
-| `direction TB` | top to bottom | cima → baixo |
-| `direction BT` | bottom to top | baixo → cima |
-| `direction LR` | left to right | esquerda → direita |
-| `direction RL` | right to left | direita → esquerda |
-
-**Regra prática:** para página didática, `TB` costuma funcionar melhor em tela vertical; para fluxos de processo, `LR` costuma ficar mais parecido com pipeline.
-
-## 4. Personalização visual com `classDef`
-
-`classDef` cria um **estilo nomeado**, parecido com uma classe CSS.
+## 6.5 Transições simples
 
 ```mermaid
-stateDiagram
-    classDef danger fill:#f00,color:white,stroke:yellow,stroke-width:2px,font-weight:bold
-
-    [*] --> Crash
-    Crash --> [*]
-
-    class Crash danger
+stateDiagram-v2
+    Parado --> EmMovimento
+    EmMovimento --> Parado
 ```
 
-### 4.1 Propriedades mais úteis em `classDef`
+Se um estado ainda não foi declarado, Mermaid cria esse estado a partir do ID usado na transição.
 
-| Propriedade | Afeta | Exemplo |
-|---|---|---|
-| `fill` | fundo do estado | `fill:#f00` |
-| `color` | cor do texto | `color:white` |
-| `stroke` | cor da borda | `stroke:yellow` |
-| `stroke-width` | espessura da borda | `stroke-width:2px` |
-| `font-weight` | peso da fonte | `font-weight:bold` |
-| `font-style` | estilo da fonte | `font-style:italic` |
-| `font-size` | tamanho do texto | `font-size:18px` |
-| `font-family` | família tipográfica | `font-family:Arial` |
-| `stroke-dasharray` | borda tracejada | `stroke-dasharray:5 5` |
-
-Exemplo completo:
+## 6.6 Transições com rótulo
 
 ```mermaid
-stateDiagram
-    classDef normal fill:#fff,color:#111,stroke:#999,stroke-width:1px
-    classDef warning fill:#fff3cd,color:#664d03,stroke:#ffca2c,stroke-width:2px
-    classDef danger fill:#dc3545,color:#fff,stroke:#842029,stroke-width:3px,font-weight:bold
-
-    [*] --> Validando
-    Validando --> Aprovado
-    Validando --> Erro
-
-    class Validando warning
-    class Aprovado normal
-    class Erro danger
+stateDiagram-v2
+    Idle --> Loading: clicar em carregar
+    Loading --> Success: resposta 200
+    Loading --> Error: timeout
 ```
 
-## 5. Duas formas de aplicar estilo
+Use rótulos para eventos, condições ou respostas.
 
-### 5.1 Usando `class`
-
-```mermaid
-stateDiagram
-    classDef danger fill:#f00,color:white
-
-    [*] --> Crash
-    Crash --> [*]
-
-    class Crash danger
-```
-
-Forma mental:
-
-```txt
-class [estado] [classe]
-```
-
-### 5.2 Usando `:::`
-
-```mermaid
-stateDiagram
-    classDef danger fill:#f00,color:white
-
-    [*] --> Crash:::danger
-    Crash --> [*]
-```
-
-Forma mental:
-
-```txt
-Estado:::Classe
-```
-
-### 5.3 Quando usar cada um?
-
-| Forma | Quando usar |
+| Tipo de rótulo | Exemplo |
 |---|---|
-| `class Crash danger` | melhor para leitura, manutenção e vários estados |
-| `Crash:::danger` | útil para aplicar estilo diretamente na linha da transição |
-| `class A,B,C danger` | bom para aplicar o mesmo estilo em vários estados |
+| Evento | `clicar em salvar` |
+| Condição | `se válido` |
+| Resposta | `HTTP 200` |
+| Falha | `timeout` |
+| Ação | `tentar novamente` |
 
-## 6. Limitações reais do `classDef` em `stateDiagram`
-
-A documentação lista duas limitações:
-
-1. não pode ser aplicado a estados de início/fim pela forma comum;
-2. não pode ser aplicado a estados compostos ou dentro deles.
-
-Exemplo problemático:
+## 6.7 Direção do layout
 
 ```mermaid
-stateDiagram
-    classDef danger fill:#f00,color:white
-
-    [*] --> A
-    A --> [*]
-
-    class end danger
+stateDiagram-v2
+    direction LR
+    [*] --> Rascunho
+    Rascunho --> Revisao
+    Revisao --> Publicado
+    Publicado --> [*]
 ```
 
-`end` não é o estado final. O estado final é o símbolo especial `[*]`.
+| Comando | Direção | Melhor uso |
+|---|---|---|
+| `direction TB` | cima → baixo | fluxos didáticos verticais |
+| `direction BT` | baixo → cima | casos raros, leitura invertida |
+| `direction LR` | esquerda → direita | pipelines e ciclos curtos |
+| `direction RL` | direita → esquerda | casos específicos de layout |
 
-## 7. Personalização com estados compostos
+## 6.8 ID interno diferente do texto visual
 
-Estado composto é um estado “grande” que contém outros estados.
+Forma recomendada para textos longos:
 
 ```mermaid
-stateDiagram
+stateDiagram-v2
+    state "Usuário autenticado" as Authenticated
+    [*] --> Authenticated
+    Authenticated --> [*]
+```
+
+Forma curta:
+
+```mermaid
+stateDiagram-v2
+    Authenticated: Usuário autenticado
+    [*] --> Authenticated
+    Authenticated --> [*]
+```
+
+| Elemento | Papel |
+|---|---|
+| `Authenticated` | ID interno usado no código |
+| `Usuário autenticado` | texto exibido no diagrama |
+
+## 6.9 Estado composto
+
+Use quando um estado possui um fluxo interno.
+
+```mermaid
+stateDiagram-v2
     [*] --> Pedido
 
     state Pedido {
@@ -816,12 +1277,12 @@ Pedido
  └─ Enviado
 ```
 
-Use quando um estado tem uma vida interna própria.
+## 6.10 `choice`
 
-## 8. Personalização com `choice`
+Use `choice` para bifurcações condicionais.
 
 ```mermaid
-stateDiagram
+stateDiagram-v2
     [*] --> Validar
     Validar --> Decisao
 
@@ -834,17 +1295,12 @@ stateDiagram
     Reprovado --> [*]
 ```
 
-Use `choice` quando existe bifurcação lógica:
+## 6.11 `fork` e `join`
 
-```txt
-se válido   → Aprovado
-se inválido → Reprovado
-```
-
-## 9. Personalização com fork/join
+Use quando uma etapa se divide em atividades paralelas e depois se reúne.
 
 ```mermaid
-stateDiagram
+stateDiagram-v2
     [*] --> Preparar
 
     state Fork <<fork>>
@@ -861,1287 +1317,12 @@ stateDiagram
     Finalizado --> [*]
 ```
 
-Leitura:
+## 6.12 Concorrência com `--`
 
-```txt
-Preparar
-   ↓
-divide em duas tarefas
-   ↓
-junta novamente
-   ↓
-Finalizado
-```
-
-## 10. Personalização com notas
+Use `--` dentro de estado composto para regiões paralelas.
 
 ```mermaid
-stateDiagram
-    [*] --> Login
-    Login --> Dashboard
-
-    note right of Login
-        Validar usuário,
-        senha e MFA.
-    end note
-```
-
-Posições principais:
-
-| Sintaxe | Resultado |
-|---|---|
-| `note right of Estado` | nota à direita |
-| `note left of Estado` | nota à esquerda |
-
-## 11. Personalização com concorrência
-
-```mermaid
-stateDiagram
-    [*] --> Ativo
-
-    state Ativo {
-        [*] --> PrimeiraRegiao
-        PrimeiraRegiao --> Rodando
-
-        --
-        [*] --> SegundaRegiao
-        SegundaRegiao --> Monitorando
-    }
-```
-
-O separador `--` cria regiões paralelas dentro de um estado composto.
-
-## 12. Personalização com comentários
-
-```mermaid
-stateDiagram
-    %% Este comentário será ignorado pelo Mermaid
-    [*] --> Still
-    Still --> Moving
-```
-
-Comentários precisam estar em linha própria e começar com `%%`.
-
-## 13. Personalização por tema
-
-```mermaid
----
-config:
-  theme: base
-  themeVariables:
-    primaryColor: "#ffffff"
-    primaryTextColor: "#111111"
-    primaryBorderColor: "#444444"
-    lineColor: "#666666"
-    fontFamily: "Arial"
----
-stateDiagram
-    [*] --> Still
-    Still --> Moving
-```
-
-Temas disponíveis: `default`, `neutral`, `dark`, `forest` e `base`. O `base` é o tema modificável via `themeVariables`.
-
-### 13.1 Variáveis relevantes
-
-| Variável | Uso |
-|---|---|
-| `fontFamily` | fonte do diagrama |
-| `fontSize` | tamanho base da fonte |
-| `primaryColor` | cor base de fundo dos nós |
-| `primaryTextColor` | cor base do texto |
-| `primaryBorderColor` | cor base de borda |
-| `lineColor` | cor das linhas |
-| `noteBkgColor` | fundo das notas |
-| `noteTextColor` | texto das notas |
-| `noteBorderColor` | borda das notas |
-| `labelColor` | variável específica para labels em State |
-| `altBackground` | fundo alternativo em estados compostos profundos |
-
-## 14. Cuidado com nomes de cor no tema
-
-Em `classDef`, é comum funcionar:
-
-```mermaid
-classDef danger fill:red,color:white
-```
-
-Mas em `themeVariables`, prefira hexadecimal:
-
-```yaml
-primaryColor: "#ff0000"
-```
-
-## 15. Diretivas antigas
-
-Exemplo antigo:
-
-```mermaid
-%%{init: { "theme": "dark" } }%%
-stateDiagram
-    [*] --> Still
-```
-
-Para material novo, prefira:
-
-```mermaid
----
-config:
-  theme: dark
----
-stateDiagram
-    [*] --> Still
-```
-
-## 16. CSS externo da página HTML
-
-Exemplo seguro:
-
-```css
-.mermaid svg {
-  max-width: 100%;
-  height: auto;
-}
-
-.mermaid svg text,
-.mermaid svg tspan {
-  font-family: system-ui, sans-serif;
-}
-```
-
-Exemplo perigoso:
-
-```css
-.mermaid svg text,
-.mermaid svg tspan {
-  fill: #111 !important;
-}
-```
-
-Esse CSS pode fazer `Crash` continuar com texto escuro mesmo com `color:white`.
-
-## 17. Correção defensiva para preservar `classDef`
-
-```css
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .stateLabel,
-.mermaid svg .badBadEvent .label {
-  fill: #fff !important;
-  color: #fff !important;
-  font-weight: 700 !important;
-}
-
-.mermaid svg .badBadEvent rect {
-  fill: #f00 !important;
-  stroke: yellow !important;
-  stroke-width: 2px !important;
-}
-```
-
-## 18. O que dá e o que não dá para personalizar com segurança
-
-| Tipo de personalização | Melhor ferramenta | Observação |
-|---|---|---|
-| fundo de estado | `classDef fill` | geralmente funciona bem |
-| texto do estado | `classDef color` + CSS defensivo se necessário | pode ser sobrescrito por `text/tspan fill` |
-| borda do estado | `stroke`, `stroke-width` | geralmente funciona bem |
-| fonte/itálico/negrito | `font-style`, `font-weight`, `font-size` | depende do SVG final |
-| direção | `direction TB/LR/...` | suportado no próprio diagrama |
-| nota | `note right/left of` | conteúdo explicativo |
-| cor da nota | `themeVariables` | `noteBkgColor`, `noteTextColor`, `noteBorderColor` |
-| tema geral | frontmatter `config` | usar `theme: base` |
-| estado inicial/final | limitado | `classDef` tem limitação documentada |
-| estado composto | limitado | `classDef` tem limitação documentada |
-| seta individual | não é o foco documentado em `stateDiagram` | melhor não prometer `linkStyle` aqui |
-| SVG final na página | CSS externo | útil, mas pode quebrar se for amplo demais |
-
-## 19. Modelo mental definitivo
-
-```txt
-1. Mermaid syntax
-   classDef, class, direction, note, state, choice, fork
-
-2. Mermaid config/theme
-   theme, themeVariables, fontFamily, labelColor, noteBkgColor
-
-3. CSS da página HTML
-   .mermaid svg, text, tspan, rect, path, .stateLabel
-```
-
-## 20. Exemplo completo didático
-
-```mermaid
----
-config:
-  theme: base
-  themeVariables:
-    primaryColor: "#ffffff"
-    primaryTextColor: "#111111"
-    primaryBorderColor: "#666666"
-    lineColor: "#666666"
-    noteBkgColor: "#fff3cd"
-    noteTextColor: "#664d03"
-    noteBorderColor: "#ffca2c"
-    fontFamily: "Arial"
----
-stateDiagram
-    direction TB
-
-    accTitle: Fluxo de autenticação
-    accDescr: Diagrama mostra login, validação, aprovação, bloqueio e erro.
-
-    classDef normal fill:#ffffff,color:#111111,stroke:#666666,stroke-width:1px
-    classDef active fill:#e7f1ff,color:#084298,stroke:#0d6efd,stroke-width:2px
-    classDef success fill:#d1e7dd,color:#0f5132,stroke:#198754,stroke-width:2px
-    classDef danger fill:#dc3545,color:#ffffff,stroke:#842029,stroke-width:3px,font-weight:bold
-    classDef decision fill:#fff3cd,color:#664d03,stroke:#ffca2c,stroke-width:2px
-
-    [*] --> Login
-    Login --> Validar: enviar credenciais
-
-    state ValidarCredenciais <<choice>>
-    Validar --> ValidarCredenciais
-
-    ValidarCredenciais --> Dashboard: válido
-    ValidarCredenciais --> Bloqueado: muitas tentativas
-    ValidarCredenciais --> Erro: inválido
-
-    Dashboard --> [*]
-    Bloqueado --> [*]
-    Erro --> Login: tentar novamente
-
-    note right of Login
-        Entrada do usuário.
-    end note
-
-    class Login normal
-    class Validar active
-    class Dashboard success
-    class Bloqueado,Erro danger
-    class ValidarCredenciais decision
-```
-
-## Resumo da Aula 2
-
-| Camada | Serve para |
-|---|---|
-| `state`, `ID: descrição` | mudar nome exibido |
-| `-->: texto` | rotular transição |
-| `direction` | mudar layout |
-| `note` | adicionar explicação |
-| `choice` | criar decisão |
-| `fork/join` | criar divisão/junção de fluxo |
-| `state { ... }` | criar estado composto |
-| `classDef` | criar estilo visual |
-| `class` | aplicar estilo depois |
-| `:::` | aplicar estilo inline |
-| `themeVariables` | configurar aparência geral |
-| CSS externo | corrigir/polir SVG final da página |
-
----
-
-# Aula 3 — Diagnóstico visual avançado do Mermaid dentro de uma página HTML local-first
-
-Agora saímos da sintaxe pura do Mermaid e entramos no ponto que costuma causar bugs reais:
-
-> O bloco Mermaid está correto, mas a página HTML renderiza diferente do GitHub, StackEdit ou Mermaid Live Editor.
-
-Isso acontece porque o Mermaid transforma o bloco textual em **SVG**, e depois o **CSS da página** pode interferir nesse SVG.
-
-## 1. Pipeline mental: do Markdown até o SVG
-
-Quando você escreve:
-
-````md
-```mermaid
-stateDiagram
-    classDef badBadEvent fill:#f00,color:white
-    [*] --> Crash
-    Crash --> [*]
-    class Crash badBadEvent
-```
-````
-
-a página geralmente faz:
-
-```txt
-Markdown bruto
-   ↓
-Parser Markdown
-   ↓
-Bloco <pre><code class="language-mermaid">
-   ↓
-JS detecta blocos Mermaid
-   ↓
-mermaid.render() / mermaid.run()
-   ↓
-SVG final
-   ↓
-CSS da página altera o SVG
-```
-
-## 2. O erro mais comum: “o Mermaid está certo, mas o CSS final venceu”
-
-Exemplo:
-
-```mermaid
-classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
-class Crash badBadEvent
-```
-
-| Regra | Resultado esperado |
-|---|---|
-| `fill:#f00` | fundo vermelho |
-| `color:white` | texto branco |
-| `font-weight:bold` | texto em negrito |
-| `stroke:yellow` | borda amarela |
-| `stroke-width:2px` | borda mais grossa |
-
-Só que o Mermaid gera **SVG**, e em SVG o texto é frequentemente pintado por `fill`, não apenas por `color`.
-
-Este CSS externo pode quebrar `color:white`:
-
-```css
-.mermaid svg text,
-.mermaid svg tspan {
-  fill: #111 !important;
-}
-```
-
-## 3. Por que o fundo muda, mas o texto não?
-
-Porque o fundo e o texto são elementos diferentes dentro do SVG.
-
-Estrutura conceitual:
-
-```html
-<g class="state badBadEvent">
-  <rect class="basic label-container" />
-  <g class="label">
-    <text>
-      <tspan>Crash</tspan>
-    </text>
-  </g>
-</g>
-```
-
-Modelo mental:
-
-```txt
-Crash
-├─ retângulo  → fill vermelho funcionou
-└─ texto      → fill foi sobrescrito pela página
-```
-
-## 4. Diagnóstico no DevTools
-
-### Passo 1 — Inspecione o texto
-
-```txt
-Botão direito no texto do estado → Inspecionar
-```
-
-Procure:
-
-```html
-<text>
-<tspan>Crash</tspan>
-```
-
-ou:
-
-```html
-<span class="nodeLabel">Crash</span>
-```
-
-### Passo 2 — Veja qual regra venceu
-
-Na aba Styles/Computed, procure:
-
-```css
-fill
-color
-font-weight
-font-style
-```
-
-O problema pode vir de:
-
-```css
-.markdown-body svg text {
-  fill: var(--text-color);
-}
-```
-
-ou:
-
-```css
-.mermaid text {
-  fill: currentColor;
-}
-```
-
-ou:
-
-```css
-svg text {
-  fill: #222 !important;
-}
-```
-
-### Passo 3 — Verifique se a classe existe no SVG
-
-Procure:
-
-```html
-<g class="state badBadEvent">
-```
-
-ou:
-
-```html
-<g class="state default badBadEvent">
-```
-
-Se a classe não aparece, o problema está antes:
-
-| Causa possível | Onde olhar |
-|---|---|
-| Markdown alterou o bloco | parser Markdown |
-| Mermaid não renderizou o bloco original | JS de renderização |
-| sanitizador removeu algo | função de limpeza HTML |
-| erro de sintaxe | console do navegador |
-| bloco foi convertido em texto comum | pipeline Markdown |
-
-Se a classe aparece, mas a cor não, o problema provavelmente é CSS vencendo CSS.
-
-## 5. Checklist dos bugs visuais mais comuns
-
-### 5.1 Texto não fica branco
-
-Sintoma:
-
-```txt
-Crash tem fundo vermelho, mas texto preto/cinza.
-```
-
-Causa provável:
-
-```css
-.mermaid text,
-.mermaid tspan {
-  fill: alguma-cor;
-}
-```
-
-Correção típica:
-
-```css
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .stateLabel,
-.mermaid svg .badBadEvent .label {
-  fill: #fff !important;
-  color: #fff !important;
-}
-```
-
-### 5.2 Mermaid gigante/desproporcional
-
-Sintoma:
-
-```txt
-O diagrama ocupa a tela inteira ou fica muito maior que o exemplo base.
-```
-
-Causas prováveis:
-
-```css
-.mermaid svg {
-  width: 100%;
-  height: 100%;
-}
-```
-
-ou:
-
-```css
-svg {
-  width: 100vw;
-}
-```
-
-Correção defensiva:
-
-```css
-.mermaid {
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-.mermaid svg {
-  display: block;
-  max-width: 100%;
-  height: auto;
-  margin-inline: auto;
-}
-```
-
-Evite:
-
-```css
-.mermaid svg {
-  width: 100% !important;
-  height: 100% !important;
-}
-```
-
-### 5.3 Fundo colorido aparecendo onde não deveria
-
-Sintoma:
-
-```txt
-O diagrama aparece com uma caixa/fundo cinza, azul, preto ou colorido.
-```
-
-Causa provável:
-
-```css
-pre,
-code,
-.markdown-body pre,
-.mermaid {
-  background: alguma-cor;
-}
-```
-
-Correção típica:
-
-```css
-.mermaid {
-  background: transparent;
-}
-
-.mermaid svg {
-  background: transparent;
-}
-```
-
-E, se houver wrapper:
-
-```css
-.mermaid-rendered,
-.markdown-body .mermaid {
-  background: transparent;
-  border: 0;
-}
-```
-
-### 5.4 Texto desalinhado dentro do retângulo
-
-Causas possíveis:
-
-1. CSS global alterou `line-height`;
-2. CSS global alterou `font-size`;
-3. CSS global alterou `dominant-baseline`;
-4. CSS global alterou `text-anchor`;
-5. wrapper HTML interferiu em `<foreignObject>`;
-6. versão diferente do Mermaid gerou estrutura diferente.
-
-Correções possíveis:
-
-```css
-.mermaid svg text,
-.mermaid svg tspan {
-  line-height: normal;
-}
-```
-
-Se a estrutura usar `.stateLabel`:
-
-```css
-.mermaid svg .stateLabel {
-  dominant-baseline: central;
-  text-anchor: middle;
-}
-```
-
-Cuidado: se aplicado globalmente, pode mexer em labels de setas, notas e outros textos.
-
-### 5.5 Linha/seta sobrepondo o retângulo
-
-Causas possíveis:
-
-| Causa | Explicação |
-|---|---|
-| SVG escalado de forma errada | `width/height` forçados distorcem coordenadas visuais |
-| `overflow: hidden` no container | corta parte da seta/marcador |
-| CSS muda tamanho do texto depois da renderização | layout foi calculado com uma fonte/tamanho e exibido com outro |
-| re-renderização duplicada | um SVG antigo fica sobreposto |
-| Mermaid inicializa antes da fonte/layout estabilizar | medidas iniciais ficam erradas |
-
-Correção base:
-
-```css
-.mermaid {
-  overflow: visible;
-}
-
-.mermaid svg {
-  overflow: visible;
-}
-```
-
-Correção de robustez no JS:
-
-```js
-await mermaid.run({ querySelector: ".mermaid" });
-```
-
-Se a página troca tema/fonte/tamanho depois:
-
-```js
-requestAnimationFrame(() => {
-  mermaid.run({ querySelector: ".mermaid" });
-});
-```
-
-## 6. Regra de ouro: não estilize `svg text` globalmente
-
-Perigoso:
-
-```css
-svg text {
-  fill: var(--text-color);
-}
-```
-
-Também perigoso:
-
-```css
-.mermaid text {
-  fill: var(--text-color) !important;
-}
-```
-
-Melhor:
-
-```css
-.markdown-body > :not(.mermaid) svg text {
-  fill: var(--text-color);
-}
-```
-
-ou, mais simples:
-
-```css
-.mermaid svg text {
-  font-family: inherit;
-}
-```
-
-sem forçar `fill`.
-
-## 7. `classDef` não é CSS completo
-
-O `classDef` parece CSS, mas não é a mesma coisa que escrever CSS livre.
-
-Exemplo:
-
-```mermaid
-classDef danger fill:#f00,color:white,stroke:yellow
-```
-
-`class end badBadEvent` não estiliza automaticamente `[*]`; tenta estilizar um estado chamado `end`.
-
-## 8. Tema Mermaid também pode interferir
-
-Exemplo:
-
-```js
-mermaid.initialize({
-  theme: "base",
-  themeVariables: {
-    primaryColor: "#ffffff",
-    primaryTextColor: "#111111",
-    lineColor: "#555555"
-  }
-});
-```
-
-Para `stateDiagram`, variáveis como `labelColor` e `altBackground` também são relevantes.
-
-Exemplo útil:
-
-```js
-mermaid.initialize({
-  startOnLoad: false,
-  theme: "base",
-  themeVariables: {
-    primaryColor: "#ffffff",
-    primaryTextColor: "#111111",
-    primaryBorderColor: "#64748b",
-    lineColor: "#64748b",
-    labelColor: "#111111",
-    noteBkgColor: "#fff7ed",
-    noteTextColor: "#7c2d12",
-    noteBorderColor: "#fdba74"
-  }
-});
-```
-
-## 9. Hexadecimal no tema, nomes de cor no `classDef`
-
-No tema, prefira:
-
-```yaml
-primaryColor: "#ff0000"
-```
-
-Dentro de `classDef`, é comum funcionar:
-
-```mermaid
-classDef danger fill:red,color:white
-```
-
-Mas para robustez:
-
-```mermaid
-classDef danger fill:#ff0000,color:#ffffff
-```
-
-## 10. Diferença entre corrigir “visual” e corrigir “causa”
-
-### Correção ruim
-
-```css
-.mermaid * {
-  fill: white !important;
-}
-```
-
-Problema:
-
-```txt
-Tudo fica branco: texto, linha, borda, nota, seta, marcador.
-```
-
-### Correção melhor
-
-```css
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan {
-  fill: #fff !important;
-}
-```
-
-### Correção ideal
-
-```css
-/* Não force cor global nos textos Mermaid */
-.mermaid svg text,
-.mermaid svg tspan {
-  font-family: inherit;
-}
-
-/* Preserve classe específica vinda do classDef */
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .stateLabel,
-.mermaid svg .badBadEvent .label {
-  fill: #fff !important;
-  color: #fff !important;
-  font-weight: 700 !important;
-}
-
-/* Preserve forma visual do estado */
-.mermaid svg .badBadEvent rect {
-  fill: #f00 !important;
-  stroke: yellow !important;
-  stroke-width: 2px !important;
-}
-```
-
-## 11. Diagnóstico específico para arquivo real
-
-Procurar:
-
-### CSS
-
-```css
-.mermaid
-.mermaid svg
-.mermaid text
-.mermaid tspan
-svg text
-svg *
-pre
-code
-.markdown-body
-.prose
-```
-
-### JS
-
-```js
-mermaid.initialize(...)
-mermaid.run(...)
-mermaid.render(...)
-marked(...)
-markdown-it(...)
-innerHTML
-sanitize
-DOMPurify
-```
-
-### HTML gerado
-
-```html
-<pre><code class="language-mermaid">
-<div class="mermaid">
-<svg>
-<g class="state">
-<rect>
-<text>
-<tspan>
-```
-
-### Perguntas de fluxo
-
-```txt
-1. Mermaid renderiza antes do Markdown terminar?
-2. Renderiza duas vezes?
-3. O bloco original é apagado corretamente?
-4. O tema claro/escuro força cor depois?
-5. A busca/highlight mexe dentro do SVG?
-6. O CSS de code block sobra no diagrama?
-7. O container força width/height?
-```
-
-## 12. Mini-protocolo de correção seguro
-
-```txt
-1. Confirmar que o bloco Mermaid chega intacto.
-2. Confirmar que o Mermaid renderiza uma única vez.
-3. Confirmar que a classe classDef aparece no SVG.
-4. Remover CSS global que atropela text/tspan.
-5. Criar CSS defensivo específico para classes Mermaid.
-6. Corrigir escala do SVG sem distorcer.
-7. Corrigir overflow sem cortar setas.
-8. Testar modo claro/escuro.
-9. Testar Markdown view/editor, se existir.
-10. Testar exemplos iguais ao arquivo base.
-```
-
-## 13. CSS limpo para Mermaid local-first
-
-```css
-/* Container Mermaid */
-.mermaid {
-  display: block;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: visible;
-  background: transparent;
-  text-align: center;
-}
-
-/* SVG gerado */
-.mermaid svg {
-  display: inline-block;
-  max-width: 100%;
-  height: auto;
-  overflow: visible;
-  background: transparent;
-}
-
-/* Não force cor global do texto; apenas fonte */
-.mermaid svg text,
-.mermaid svg tspan {
-  font-family: inherit;
-}
-
-/* Classe Mermaid usada no exemplo oficial */
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .label,
-.mermaid svg .badBadEvent .stateLabel {
-  fill: #fff !important;
-  color: #fff !important;
-  font-weight: 700 !important;
-}
-
-.mermaid svg .badBadEvent rect {
-  fill: #f00 !important;
-  stroke: yellow !important;
-  stroke-width: 2px !important;
-}
-```
-
-## Resumo mental da Aula 3
-
-```txt
-Bloco Mermaid correto
-   ≠
-Renderização final correta
-```
-
-Cadeia:
-
-```txt
-Mermaid syntax
-   ↓
-SVG gerado
-   ↓
-Tema Mermaid
-   ↓
-CSS da página
-   ↓
-resultado visual final
-```
-
-Para o caso estudado:
-
-```txt
-Se fundo vermelho funciona,
-mas texto branco não funciona,
-então o classDef provavelmente chegou parcialmente.
-O suspeito principal é CSS em text/tspan/fill.
-```
-
----
-
-# Aula 4 — Laboratório prático de personalizações em `stateDiagram`
-
-Esta aula trouxe um **laboratório de exemplos prontos**, cada um focado em um tipo de personalização. A ideia é aprender a identificar:
-
-```txt
-O que está sendo personalizado?
-Onde?
-Por qual comando?
-Qual camada pode quebrar isso no HTML final?
-```
-
-## 1. Laboratório 1 — Estado simples + direção
-
-```mermaid
-stateDiagram
-    direction TB
-
-    [*] --> Still
-    Still --> Moving
-    Moving --> Crash
-    Crash --> [*]
-```
-
-| Linha | Função |
-|---|---|
-| `stateDiagram` | declara diagrama de estados |
-| `direction TB` | organiza de cima para baixo |
-| `[*] --> Still` | cria estado inicial |
-| `Crash --> [*]` | cria estado final |
-
-`direction TB` altera layout, não estilo visual.
-
-## 2. Laboratório 2 — Nome técnico diferente do nome visual
-
-```mermaid
-stateDiagram
-    direction TB
-
-    state "Usuário parado" as Still
-    state "Usuário em movimento" as Moving
-    state "Evento de colisão" as Crash
-
-    [*] --> Still
-    Still --> Moving
-    Moving --> Crash
-    Crash --> [*]
-```
-
-| Elemento | Papel |
-|---|---|
-| `Still` | ID interno usado no código |
-| `"Usuário parado"` | texto que aparece visualmente |
-
-Use quando o texto visual precisa ter espaço, acento, frase longa, português natural ou rótulo didático.
-
-## 3. Laboratório 3 — Transições com rótulo
-
-```mermaid
-stateDiagram
-    direction LR
-
-    [*] --> Idle
-    Idle --> Loading: clicar em carregar
-    Loading --> Success: resposta 200
-    Loading --> Error: falha de rede
-    Success --> [*]
-    Error --> Idle: tentar novamente
-```
-
-O texto depois de `:` vira o rótulo da transição.
-
-| Caso | Exemplo |
-|---|---|
-| evento | `clicar em salvar` |
-| condição | `se válido` |
-| retorno de API | `resposta 200` |
-| erro | `timeout` |
-| ação do usuário | `confirmar` |
-
-## 4. Laboratório 4 — `classDef` básico: fundo do estado
-
-```mermaid
-stateDiagram
-    direction TB
-
-    classDef parado fill:#ffffff
-    classDef movimento fill:#e7f1ff
-    classDef erro fill:#f8d7da
-
-    [*] --> Still
-    Still --> Moving
-    Moving --> Crash
-    Crash --> [*]
-
-    class Still parado
-    class Moving movimento
-    class Crash erro
-```
-
-| Classe | Aplicada em | Resultado |
-|---|---|---|
-| `parado` | `Still` | fundo branco |
-| `movimento` | `Moving` | fundo azul claro |
-| `erro` | `Crash` | fundo vermelho claro |
-
-## 5. Laboratório 5 — Fundo, texto e borda
-
-```mermaid
-stateDiagram
-    direction TB
-
-    classDef normal fill:#ffffff,color:#111111,stroke:#64748b,stroke-width:1px
-    classDef danger fill:#dc2626,color:#ffffff,stroke:#facc15,stroke-width:3px,font-weight:bold
-
-    [*] --> Normal
-    Normal --> Crash
-    Crash --> [*]
-
-    class Normal normal
-    class Crash danger
-```
-
-| Propriedade | Efeito esperado |
-|---|---|
-| `fill:#dc2626` | fundo vermelho |
-| `color:#ffffff` | texto branco |
-| `stroke:#facc15` | borda amarela |
-| `stroke-width:3px` | borda grossa |
-| `font-weight:bold` | texto negrito |
-
-Pegadinha: `color:#ffffff` pode não vencer se a página tiver:
-
-```css
-.mermaid svg text,
-.mermaid svg tspan {
-  fill: #111 !important;
-}
-```
-
-## 6. Laboratório 6 — Itálico, negrito e tamanho de fonte
-
-```mermaid
-stateDiagram
-    direction TB
-
-    classDef normal fill:#ffffff,color:#111111
-    classDef destaque fill:#eef2ff,color:#312e81,font-style:italic,font-weight:bold,font-size:18px
-
-    [*] --> Leitura
-    Leitura --> Revisao
-    Revisao --> [*]
-
-    class Leitura normal
-    class Revisao destaque
-```
-
-| Propriedade | Efeito |
-|---|---|
-| `font-style:italic` | itálico |
-| `font-weight:bold` | negrito |
-| `font-size:18px` | tamanho |
-
-Atenção: `font-size` pode causar desalinhamento se o SVG foi medido antes de a página aplicar a fonte/tamanho final.
-
-## 7. Laboratório 7 — Borda tracejada
-
-```mermaid
-stateDiagram
-    direction LR
-
-    classDef pending fill:#fff7ed,color:#7c2d12,stroke:#fb923c,stroke-width:2px,stroke-dasharray:5 5
-    classDef done fill:#dcfce7,color:#166534,stroke:#22c55e,stroke-width:2px
-
-    [*] --> Pendente
-    Pendente --> Concluido
-    Concluido --> [*]
-
-    class Pendente pending
-    class Concluido done
-```
-
-`stroke-dasharray:5 5` cria uma borda tracejada.
-
-| Estado | Intenção visual |
-|---|---|
-| `Pendente` | temporário/incompleto |
-| `Concluido` | finalizado |
-
-## 8. Laboratório 8 — Aplicando classe em vários estados
-
-```mermaid
-stateDiagram
-    direction TB
-
-    classDef comum fill:#f8fafc,color:#0f172a,stroke:#94a3b8
-    classDef problema fill:#fee2e2,color:#991b1b,stroke:#ef4444,font-weight:bold
-
-    [*] --> A
-    A --> B
-    B --> C
-    C --> Erro
-    Erro --> [*]
-
-    class A,B,C comum
-    class Erro problema
-```
-
-Você pode aplicar uma classe a vários estados:
-
-```mermaid
-class A,B,C comum
-```
-
-Também pode funcionar com espaços:
-
-```mermaid
-class A, B, C comum
-```
-
-Para máxima previsibilidade, prefira sem espaços depois da vírgula.
-
-## 9. Laboratório 9 — Aplicação inline com `:::`
-
-```mermaid
-stateDiagram
-    direction TB
-
-    classDef danger fill:#dc2626,color:#ffffff,stroke:#facc15,stroke-width:3px,font-weight:bold
-
-    [*] --> Still
-    Still --> Crash:::danger
-    Crash --> [*]
-```
-
-| Forma | Exemplo | Melhor uso |
-|---|---|---|
-| `class` | `class Crash danger` | mais legível em diagramas médios/grandes |
-| `:::` | `Crash:::danger` | bom para exemplos curtos |
-
-## 10. Laboratório 10 — `choice` personalizado
-
-```mermaid
-stateDiagram
-    direction TB
-
-    classDef decision fill:#fef3c7,color:#92400e,stroke:#f59e0b,stroke-width:2px
-    classDef success fill:#dcfce7,color:#166534,stroke:#22c55e,stroke-width:2px
-    classDef danger fill:#fee2e2,color:#991b1b,stroke:#ef4444,stroke-width:2px
-
-    [*] --> Validar
-
-    state Decisao <<choice>>
-
-    Validar --> Decisao
-    Decisao --> Aprovado: válido
-    Decisao --> Reprovado: inválido
-
-    Aprovado --> [*]
-    Reprovado --> [*]
-
-    class Decisao decision
-    class Aprovado success
-    class Reprovado danger
-```
-
-`choice` é ideal para:
-
-```txt
-se válido   → Aprovado
-se inválido → Reprovado
-```
-
-## 11. Laboratório 11 — Notas explicativas
-
-```mermaid
-stateDiagram
-    direction LR
-
-    [*] --> Login
-    Login --> Dashboard
-
-    note right of Login
-        O usuário informa
-        login e senha.
-    end note
-
-    Dashboard --> [*]
-```
-
-| Sintaxe | Resultado |
-|---|---|
-| `note right of Estado` | nota à direita |
-| `note left of Estado` | nota à esquerda |
-
-## 12. Laboratório 12 — Estado composto
-
-```mermaid
-stateDiagram
-    direction TB
-
-    [*] --> Pedido
-
-    state Pedido {
-        [*] --> Criado
-        Criado --> Pago
-        Pago --> Enviado
-        Enviado --> [*]
-    }
-
-    Pedido --> Finalizado
-    Finalizado --> [*]
-```
-
-Modelo mental:
-
-```txt
-Pedido
- ├─ Criado
- ├─ Pago
- └─ Enviado
-```
-
-Use quando uma macroetapa tem fluxo interno próprio.
-
-## 13. Laboratório 13 — Concorrência com `--`
-
-```mermaid
-stateDiagram
-    direction TB
-
+stateDiagram-v2
     [*] --> Ativo
 
     state Ativo {
@@ -2157,208 +1338,41 @@ stateDiagram
     Ativo --> [*]
 ```
 
-O separador `--` cria regiões paralelas dentro de um estado composto.
-
-## 14. Laboratório 14 — Fork e Join
+## 6.13 Notas
 
 ```mermaid
-stateDiagram
-    direction TB
+stateDiagram-v2
+    [*] --> Login
+    Login --> Dashboard
 
-    state fork_state <<fork>>
-    state join_state <<join>>
+    note right of Login
+        Validar usuário,
+        senha e MFA.
+    end note
 
-    [*] --> Preparar
-    Preparar --> fork_state
-
-    fork_state --> EnviarEmail
-    fork_state --> RegistrarLog
-
-    EnviarEmail --> join_state
-    RegistrarLog --> join_state
-
-    join_state --> Finalizado
-    Finalizado --> [*]
+    Dashboard --> [*]
 ```
 
-| Elemento | Função |
+| Sintaxe | Uso |
 |---|---|
-| `<<fork>>` | divide o fluxo |
-| `<<join>>` | junta o fluxo novamente |
+| `note right of Estado` | nota à direita |
+| `note left of Estado` | nota à esquerda |
 
-## 15. Laboratório 15 — Comentários Mermaid
+## 6.14 Comentários
+
+Comentários Mermaid começam com `%%` e devem ficar em linha própria.
 
 ```mermaid
-stateDiagram
-    %% Este comentário não aparece no diagrama
-
+stateDiagram-v2
+    %% Comentário interno: não aparece no diagrama.
     [*] --> A
     A --> B
     B --> [*]
 ```
 
-Comentários começam com `%%`.
+Evite colocar `{` e `}` em comentários complexos, pois alguns cenários podem confundir o parser.
 
-## 16. Laboratório 16 — Tema por frontmatter
-
-```mermaid
----
-config:
-  theme: base
-  themeVariables:
-    primaryColor: "#ffffff"
-    primaryTextColor: "#111111"
-    primaryBorderColor: "#64748b"
-    lineColor: "#64748b"
-    noteBkgColor: "#fff7ed"
-    noteTextColor: "#7c2d12"
-    noteBorderColor: "#fdba74"
----
-stateDiagram
-    direction TB
-
-    [*] --> Login
-
-    note right of Login
-        Nota personalizada pelo tema.
-    end note
-
-    Login --> [*]
-```
-
-| Camada | Exemplo |
-|---|---|
-| sintaxe do diagrama | `stateDiagram`, `direction`, `classDef` |
-| configuração do diagrama | `config`, `theme`, `themeVariables` |
-| CSS externo da página | `.mermaid svg text { ... }` |
-
-## 17. Laboratório 17 — O exemplo clássico do problema
-
-```mermaid
-stateDiagram
-    direction TB
-
-    accTitle: This is the accessible title
-    accDescr: This is an accessible description
-
-    classDef notMoving fill:white
-    classDef movement font-style:italic
-    classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
-
-    [*] --> Still
-    Still --> [*]
-    Still --> Moving
-    Moving --> Still
-    Moving --> Crash
-    Crash --> [*]
-
-    class Still notMoving
-    class Moving,Crash movement
-    class Crash badBadEvent
-    class end badBadEvent
-```
-
-| Estado | Classe | Resultado esperado |
-|---|---|---|
-| `Still` | `notMoving` | fundo branco |
-| `Moving` | `movement` | texto itálico |
-| `Crash` | `movement` + `badBadEvent` | fundo vermelho, texto branco, negrito, itálico, borda amarela |
-| `end` | `badBadEvent` | provavelmente sem efeito útil |
-
-## 18. Laboratório 18 — Versão mais limpa do exemplo anterior
-
-```mermaid
-stateDiagram
-    direction TB
-
-    accTitle: Diagrama de estados com estilos
-    accDescr: Exemplo com estado parado, movimento e colisão.
-
-    classDef notMoving fill:#ffffff,color:#111111,stroke:#64748b
-    classDef movement fill:#eef2ff,color:#312e81,stroke:#6366f1,font-style:italic
-    classDef badBadEvent fill:#ff0000,color:#ffffff,font-weight:bold,stroke-width:2px,stroke:#ffff00
-
-    [*] --> Still
-    Still --> [*]
-    Still --> Moving
-    Moving --> Still
-    Moving --> Crash
-    Crash --> [*]
-
-    class Still notMoving
-    class Moving movement
-    class Crash movement
-    class Crash badBadEvent
-```
-
-| Antes | Depois | Por quê |
-|---|---|---|
-| `fill:white` | `fill:#ffffff` | mais previsível |
-| `color:white` | `color:#ffffff` | mais previsível |
-| `stroke:yellow` | `stroke:#ffff00` | mais previsível |
-| `class Moving, Crash movement` | linhas separadas | leitura mais clara |
-| `class end badBadEvent` | removido | não estiliza `[*]` de forma confiável |
-
-## 19. Laboratório 19 — CSS externo correto para preservar `badBadEvent`
-
-```css
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .label,
-.mermaid svg .badBadEvent .stateLabel {
-  fill: #ffffff !important;
-  color: #ffffff !important;
-  font-weight: 700 !important;
-}
-
-.mermaid svg .badBadEvent rect {
-  fill: #ff0000 !important;
-  stroke: #ffff00 !important;
-  stroke-width: 2px !important;
-}
-```
-
-Isso mira apenas elementos dentro de `.badBadEvent`.
-
-## 20. Laboratório 20 — CSS seguro para tamanho e proporção
-
-```css
-.mermaid {
-  display: block;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: visible;
-  background: transparent;
-  text-align: center;
-}
-
-.mermaid svg {
-  display: inline-block;
-  max-width: 100%;
-  height: auto;
-  overflow: visible;
-  background: transparent;
-}
-```
-
-| Problema | Correção |
-|---|---|
-| diagrama gigante | `max-width:100%` |
-| distorção | `height:auto` |
-| seta cortada | `overflow:visible` |
-| fundo indesejado | `background:transparent` |
-| alinhamento visual | `text-align:center` + `inline-block` |
-
-Evite:
-
-```css
-.mermaid svg {
-  width: 100% !important;
-  height: 100% !important;
-}
-```
-
-## 21. Laboratório 21 — Exemplo completo “bem comportado”
+## 6.15 Exemplo completo de referência
 
 ```mermaid
 ---
@@ -2373,7 +1387,7 @@ config:
     noteTextColor: "#7c2d12"
     noteBorderColor: "#fdba74"
 ---
-stateDiagram
+stateDiagram-v2
     direction TB
 
     accTitle: Fluxo de autenticação
@@ -2415,781 +1429,133 @@ stateDiagram
     class Bloqueado,Erro danger
 ```
 
-## 22. Checklist para revisar qualquer bloco Mermaid
-
-```txt
-1. O tipo está correto?
-   stateDiagram ou stateDiagram-v2
-
-2. A direção está definida?
-   direction TB / LR / BT / RL
-
-3. Os estados têm IDs claros?
-   Still, Moving, Crash
-
-4. Há nomes visuais separados?
-   state "Texto bonito" as ID
-
-5. As transições têm rótulo quando necessário?
-   A --> B: condição
-
-6. O classDef está correto?
-   classDef nome fill:#...,color:#...
-
-7. As classes foram aplicadas?
-   class Estado classe
-
-8. Há tentativa de estilizar [*] como se fosse estado comum?
-   class end danger → suspeito
-
-9. Há estado composto?
-   state X { ... }
-
-10. Há CSS externo podendo sobrescrever text/tspan?
-   .mermaid text, svg text, tspan
-```
-
-## Resumo da Aula 4
-
-```txt
-Personalização Mermaid em stateDiagram não é uma coisa só.
-Ela se divide em:
-
-1. estrutura
-   state, transition, choice, fork, join, note
-
-2. layout
-   direction TB/LR/BT/RL
-
-3. estilo interno
-   classDef + class + :::
-
-4. tema/configuração
-   frontmatter config + themeVariables
-
-5. CSS externo da página
-   .mermaid svg, text, tspan, rect, path
-```
-
 ---
 
-# Aula 5 — Tabela definitiva de comandos e personalizações em `stateDiagram`
+# 7. Personalização visual: `classDef`, tema e CSS
 
-Esta aula funciona como **referência prática** para escrever, revisar ou corrigir blocos Mermaid dentro de uma página HTML.
-
-## 1. Tabela geral dos comandos Mermaid em `stateDiagram`
-
-| Comando / Sintaxe | Categoria | O que faz | Exemplo | Pegadinha |
-|---|---:|---|---|---|
-| `stateDiagram` | tipo do diagrama | inicia um diagrama de estados | `stateDiagram` | usa o renderer padrão/atual |
-| `stateDiagram-v2` | tipo do diagrama | usa a sintaxe/renderer v2 em exemplos antigos/atuais | `stateDiagram-v2` | pode renderizar diferente dependendo da versão |
-| `A --> B` | transição | liga um estado a outro | `Still --> Moving` | se `A` ou `B` não existir, Mermaid cria pelo ID |
-| `A --> B: texto` | transição rotulada | adiciona texto na seta | `Login --> Dashboard: válido` | texto longo pode quebrar layout |
-| `[*] --> A` | início | define começo do fluxo | `[*] --> Still` | `[*]` não é um estado comum |
-| `A --> [*]` | fim | define encerramento do fluxo | `Crash --> [*]` | `class end ...` não estiliza automaticamente o `[*]` |
-| `direction TB` | layout | direção de cima para baixo | `direction TB` | não muda cor nem estilo |
-| `direction LR` | layout | direção da esquerda para direita | `direction LR` | pode ficar muito largo |
-| `state "Texto" as ID` | estado nomeado | separa ID interno do texto visual | `state "Usuário parado" as Still` | melhor para textos com espaço/acento |
-| `ID: Texto` | estado descrito | define descrição visual para um ID | `Still: Usuário parado` | bom para descrição curta |
-| `state X { ... }` | estado composto | cria estado com subestados | `state Pedido { ... }` | `classDef` tem limitação em compostos |
-| `state X <<choice>>` | decisão | cria bifurcação lógica | `state Decisao <<choice>>` | ideal para “se / senão” |
-| `state X <<fork>>` | fork | divide fluxo em caminhos paralelos | `state fork_state <<fork>>` | normalmente usado com join |
-| `state X <<join>>` | join | junta caminhos paralelos | `state join_state <<join>>` | use após fork |
-| `note right of A` | nota | adiciona nota à direita | `note right of Login` | nota não é estado |
-| `note left of A` | nota | adiciona nota à esquerda | `note left of Login` | nota pode aumentar largura do SVG |
-| `--` | concorrência | separa regiões paralelas em estado composto | dentro de `state X { ... }` | só faz sentido dentro de composto |
-| `%% comentário` | comentário | ignora linha no parser Mermaid | `%% observação` | precisa estar em linha própria |
-| `classDef nome ...` | estilo | cria classe visual | `classDef danger fill:#f00` | não é CSS livre, é sintaxe Mermaid |
-| `class A nome` | aplicar estilo | aplica classe a estado | `class Crash danger` | não funciona para start/end via forma comum |
-| `A:::nome` | aplicar estilo inline | aplica classe no próprio uso do estado | `Crash:::danger` | pode incluir start/end em alguns usos |
-
-## 2. Tabela de propriedades úteis em `classDef`
-
-| Propriedade | Afeta | Exemplo | Resultado esperado | Atenção em página HTML |
-|---|---:|---|---|---|
-| `fill` | fundo | `fill:#f00` | fundo vermelho | em SVG também pode afetar texto se usado no seletor errado |
-| `color` | texto | `color:white` | texto branco | pode ser vencido por CSS externo em `text/tspan` |
-| `stroke` | borda | `stroke:yellow` | borda amarela | normalmente aplica em formas/linhas |
-| `stroke-width` | borda | `stroke-width:2px` | borda mais grossa | pode alterar tamanho visual |
-| `font-weight` | texto | `font-weight:bold` | negrito | pode ser sobrescrito por CSS global |
-| `font-style` | texto | `font-style:italic` | itálico | usado no exemplo oficial `movement` |
-| `font-size` | texto | `font-size:18px` | texto maior | pode causar desalinhamento se o SVG foi medido antes |
-| `font-family` | texto | `font-family:Arial` | muda fonte | fonte diferente pode mudar largura do nó |
-| `stroke-dasharray` | borda/linha | `stroke-dasharray:5 5` | borda tracejada | útil para pendente/opcional/temporário |
-| `opacity` | forma/texto | `opacity:0.7` | transparência | pode prejudicar contraste |
-| `color:#fff` | texto | `color:#fff` | equivalente mais previsível que `white` | preferível em material robusto |
-| `fill:#ffffff` | fundo | `fill:#ffffff` | branco explícito | melhor que nome de cor para consistência |
-
-Exemplo canônico:
-
-```mermaid
-classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
-```
-
-## 3. `classDef` vs CSS externo da página
-
-| Camada | Onde fica | Exemplo | Vantagem | Risco |
-|---|---|---|---|---|
-| Mermaid interno | dentro do bloco Markdown | `classDef danger fill:#f00,color:#fff` | portátil e acompanha o diagrama | pode ser sobrescrito pelo CSS da página |
-| Tema Mermaid | `config` / `mermaid.initialize()` | `themeVariables.primaryColor` | define aparência geral | pode não resolver classe específica |
-| CSS externo | `<style>` do HTML | `.mermaid svg .danger text { fill:#fff }` | controla SVG final | se for amplo demais, quebra todos os diagramas |
-| JS de renderização | script da página | `mermaid.run()` | controla quando renderiza | renderização duplicada pode gerar bug visual |
-
-Modelo mental:
+A personalização do Mermaid tem três camadas principais:
 
 ```txt
-Mermaid classDef
-   ↓
-Mermaid gera SVG
-   ↓
-Tema aplica variáveis
-   ↓
-CSS da página pode sobrescrever
-   ↓
-resultado final no navegador
+1. Sintaxe Mermaid
+   classDef, class, :::, direction, note, state
+
+2. Configuração/tema Mermaid
+   theme, themeVariables, frontmatter, initialize
+
+3. CSS da página
+   .mermaid svg, text, tspan, rect, path, .label, .stateLabel
 ```
 
-## 4. Aplicação de classe com `class` vs `:::`
+## 7.1 `classDef`
 
-| Forma | Sintaxe | Exemplo | Melhor uso | Observação |
-|---|---|---|---|---|
-| `class` | `class Estado Classe` | `class Crash danger` | manutenção | mais legível em diagramas grandes |
-| `class` múltiplo | `class A,B Classe` | `class Moving,Crash movement` | estilo em lote | estados separados por vírgula |
-| `:::` | `Estado:::Classe` | `Crash:::danger` | exemplo curto/inline | aplica no próprio uso do estado |
-| múltiplas classes | `class Crash a` + `class Crash b` | `class Crash movement` + `class Crash danger` | acumular estilos | ordem/conflito depende do SVG/CSS final |
-
-Exemplo:
+`classDef` cria um estilo nomeado.
 
 ```mermaid
-stateDiagram
-    classDef movement font-style:italic
-    classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
+stateDiagram-v2
+    classDef danger fill:#dc2626,color:#ffffff,stroke:#facc15,stroke-width:3px,font-weight:bold
 
-    [*] --> Still
-    Still --> Moving
-    Moving --> Crash
+    [*] --> Crash
     Crash --> [*]
 
-    class Moving,Crash movement
-    class Crash badBadEvent
-```
-
-`Crash` recebe duas classes: `movement` e `badBadEvent`.
-
-## 5. Limitações oficiais de `classDef` em `stateDiagram`
-
-| Alvo | Funciona com `class Estado Classe`? | Observação |
-|---|---:|---|
-| estado simples | sim | exemplo: `class Crash danger` |
-| vários estados simples | sim | exemplo: `class A,B,C normal` |
-| estado inicial `[*]` | não pela forma comum | `[*]` é marcador especial |
-| estado final `[*]` | não pela forma comum | `class end danger` não resolve |
-| estado composto | limitado/não confiável | limitação oficial |
-| estado interno de composto | limitado/não confiável | limitação oficial |
-| uso inline `:::` | parcialmente útil | pode ajudar em alguns usos |
-
-Ponto crítico:
-
-```mermaid
-class end badBadEvent
-```
-
-Isso tenta aplicar classe a um estado chamado literalmente `end`, não ao `[*]`.
-
-## 6. Personalização por tema Mermaid
-
-| Variável | Afeta | Exemplo | Uso recomendado |
-|---|---:|---|---|
-| `theme` | tema geral | `theme: base` | usar `base` quando quiser customizar |
-| `primaryColor` | fundo base dos nós | `primaryColor:"#ffffff"` | aparência padrão dos estados |
-| `primaryTextColor` | texto dos nós | `primaryTextColor:"#111111"` | texto geral |
-| `primaryBorderColor` | borda dos nós | `primaryBorderColor:"#64748b"` | borda padrão |
-| `lineColor` | linhas/setas | `lineColor:"#64748b"` | setas e conexões |
-| `fontFamily` | fonte | `fontFamily:"Arial"` | padronização tipográfica |
-| `fontSize` | tamanho base | `fontSize:"16px"` | cuidado com desalinhamento |
-| `noteBkgColor` | fundo das notas | `noteBkgColor:"#fff7ed"` | notas explicativas |
-| `noteTextColor` | texto das notas | `noteTextColor:"#7c2d12"` | contraste das notas |
-| `noteBorderColor` | borda das notas | `noteBorderColor:"#fdba74"` | contorno das notas |
-| `labelColor` | cor de label em State | `labelColor:"#111111"` | variável específica de state |
-| `altBackground` | fundo alternativo | `altBackground:"#f8fafc"` | estados compostos profundos |
-
-## 7. Quando usar `classDef`, tema ou CSS externo
-
-| Objetivo | Melhor ferramenta | Exemplo | Por quê |
-|---|---|---|---|
-| pintar um estado específico | `classDef` | `classDef danger fill:#f00,color:#fff` | fica junto do diagrama |
-| pintar vários estados por categoria | `classDef` + `class` | `class Erro,Falha danger` | fácil de manter |
-| definir cor geral de todos os estados | tema | `primaryColor` | aparência global consistente |
-| definir cor de notas | tema | `noteBkgColor` | notas são globais no tema |
-| corrigir texto que não fica branco | CSS externo restrito | `.badBadEvent text { fill:#fff }` | SVG final pode exigir `fill` |
-| corrigir diagrama gigante | CSS externo | `.mermaid svg { max-width:100%; height:auto }` | problema é layout HTML/CSS |
-| evitar fundo de bloco de código | CSS externo | `.mermaid { background:transparent }` | Mermaid nasce de bloco Markdown |
-| corrigir renderização duplicada | JS | controlar `mermaid.run()` | problema é pipeline |
-| preservar portabilidade | Mermaid puro | `classDef`, `state`, `note` | evita depender do CSS da página |
-
-## 8. Problemas visuais e causa provável
-
-| Sintoma | Causa provável | Onde investigar | Correção típica |
-|---|---|---|---|
-| texto do `Crash` não fica branco | CSS força `fill` em `text/tspan` | CSS da página | seletor específico para `.badBadEvent text/tspan` |
-| fundo vermelho funciona, texto não | `fill` do `rect` aplicado, mas texto sobrescrito | DevTools no SVG | corrigir `text`, `tspan`, `.label`, `.stateLabel` |
-| diagrama fica gigante | `svg width/height` forçado | CSS `.mermaid svg` | `max-width:100%; height:auto` |
-| fundo colorido atrás do diagrama | estilo de `pre/code` vazando | CSS de Markdown | `background:transparent` em `.mermaid` |
-| linha cruza retângulo | escala, fonte ou renderização em hora errada | CSS + JS | evitar distorção e renderizar após layout |
-| texto desalinhado | fonte/tamanho/line-height alterado depois | CSS global | remover override global agressivo |
-| nota aumenta demais a largura | texto longo na nota | bloco Mermaid | quebrar linha manualmente |
-| `class end ...` não funciona | `end` não é `[*]` | bloco Mermaid | remover ou usar outra estratégia |
-| estado composto não estiliza | limitação oficial de `classDef` | bloco Mermaid | estilizar filhos simples quando possível |
-| modo escuro quebra contraste | tema/CSS global conflitante | CSS + themeVariables | definir contraste e preservar `classDef` |
-
-## 9. Boas práticas para página local-first
-
-| Regra | Faça | Evite |
-|---|---|---|
-| preservar `classDef` | deixe Mermaid controlar estilos específicos | forçar `.mermaid text { fill: ... !important }` |
-| controlar escala | `max-width:100%; height:auto` | `width:100%; height:100%` sem critério |
-| evitar distorção | `display:inline-block` ou `block` | esticar SVG nos dois eixos |
-| manter fundo limpo | `.mermaid { background:transparent }` | herdar fundo de `pre/code` |
-| corrigir cor específica | `.badBadEvent text/tspan` | `.mermaid * { fill:white }` |
-| usar cor em tema | hexadecimal | nomes como `red` em `themeVariables` |
-| nomear estados | `state "Texto longo" as ID` | usar ID com espaço diretamente |
-| texto longo | quebrar em nota ou descrição curta | rótulo de seta enorme |
-| estado final | tratar `[*]` como especial | `class end danger` |
-| manutenção | classes por intenção semântica | nomes só visuais como `vermelho1` |
-
-## 10. Template seguro
-
-```mermaid
----
-config:
-  theme: base
-  themeVariables:
-    primaryColor: "#ffffff"
-    primaryTextColor: "#111111"
-    primaryBorderColor: "#64748b"
-    lineColor: "#64748b"
-    noteBkgColor: "#fff7ed"
-    noteTextColor: "#7c2d12"
-    noteBorderColor: "#fdba74"
-    labelColor: "#111111"
----
-stateDiagram
-    direction TB
-
-    accTitle: Fluxo de estados personalizado
-    accDescr: Diagrama com estados normais, movimento e evento crítico.
-
-    classDef normal fill:#ffffff,color:#111111,stroke:#64748b,stroke-width:1px
-    classDef movement fill:#eef2ff,color:#312e81,stroke:#6366f1,font-style:italic
-    classDef danger fill:#ff0000,color:#ffffff,font-weight:bold,stroke:#ffff00,stroke-width:2px
-
-    [*] --> Still
-    Still --> Moving: iniciar
-    Moving --> Still: parar
-    Moving --> Crash: colisão
-    Crash --> [*]
-
-    note right of Crash
-        Evento crítico.
-        Deve aparecer com texto branco.
-    end note
-
-    class Still normal
-    class Moving movement
-    class Crash movement
     class Crash danger
 ```
 
-## 11. CSS externo seguro para preservar o template
+## 7.2 Propriedades úteis em `classDef`
 
-```css
-.mermaid {
-  display: block;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: visible;
-  background: transparent;
-  text-align: center;
-}
+| Propriedade | Afeta | Exemplo recomendado | Observação |
+|---|---|---|---|
+| `fill` | fundo do estado/nó | `fill:#ffffff` | em SVG, `fill` também pode aparecer em textos se o seletor for amplo |
+| `color` | texto | `color:#111111` | pode ser vencido por CSS externo em `text`/`tspan` |
+| `stroke` | borda | `stroke:#64748b` | também usado em linhas/contornos SVG |
+| `stroke-width` | espessura da borda | `stroke-width:2px` | pode alterar percepção de tamanho |
+| `font-weight` | peso da fonte | `font-weight:bold` | pode ser sobrescrito por CSS global |
+| `font-style` | itálico/normal | `font-style:italic` | útil para estados especiais |
+| `font-size` | tamanho do texto | `font-size:16px` | fonte maior pode exigir re-render após troca de fonte/tema |
+| `font-family` | fonte | `font-family:system-ui,sans-serif` | prefira pilha com fallback, não apenas `Arial` |
+| `stroke-dasharray` | borda tracejada | `stroke-dasharray:5 5` | útil para pendente, opcional, fallback |
+| `opacity` | transparência | `opacity:0.9` | cuidado com contraste/acessibilidade |
 
-.mermaid svg {
-  display: inline-block;
-  max-width: 100%;
-  height: auto;
-  overflow: visible;
-  background: transparent;
-}
+> Para guia público, prefira hexadecimal (`#ffffff`) e pilha de fonte (`system-ui,sans-serif`) em vez de nomes soltos como `white`, `yellow` ou `Arial`.
 
-.mermaid svg text,
-.mermaid svg tspan {
-  font-family: inherit;
-}
-
-.mermaid svg .danger text,
-.mermaid svg .danger tspan,
-.mermaid svg .danger .label,
-.mermaid svg .danger .stateLabel {
-  fill: #ffffff !important;
-  color: #ffffff !important;
-  font-weight: 700 !important;
-}
-
-.mermaid svg .danger rect {
-  fill: #ff0000 !important;
-  stroke: #ffff00 !important;
-  stroke-width: 2px !important;
-}
-```
-
-## 12. Checklist final antes de corrigir uma página
-
-```txt
-1. O bloco Mermaid chega intacto ao renderer?
-2. O Markdown preserva classDef, class, :::, accTitle e accDescr?
-3. O Mermaid renderiza uma única vez?
-4. A classe personalizada aparece no SVG final?
-5. O CSS global sobrescreve .mermaid text, tspan, .label ou .stateLabel?
-6. O SVG está sendo esticado por width, height, transform ou container?
-7. O fundo do bloco de código está vazando para o Mermaid?
-8. O modo claro/escuro altera contraste indevidamente?
-9. O exemplo oficial badBadEvent fica igual ao arquivo base?
-10. A correção preserva os demais diagramas e funcionalidades?
-```
-
-## Resumo mental da Aula 5
-
-```txt
-Para personalizar Mermaid stateDiagram:
-
-1. Estrutura:
-   state, transition, choice, fork, join, note
-
-2. Layout:
-   direction TB/LR/BT/RL
-
-3. Estilo interno:
-   classDef + class + :::
-
-4. Tema:
-   config + themeVariables
-
-5. Correção HTML real:
-   CSS/JS do renderer local-first
-```
-
----
-
-# Aula 6 — Estudo específico do `badBadEvent`
-
-Foco exato:
+## 7.3 Aplicar classe com `class`
 
 ```mermaid
-classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
-class Crash badBadEvent
+stateDiagram-v2
+    classDef pending fill:#fff7ed,color:#7c2d12,stroke:#fb923c,stroke-width:2px,stroke-dasharray:5 5
+    classDef done fill:#dcfce7,color:#166534,stroke:#22c55e,stroke-width:2px
+
+    [*] --> Pendente
+    Pendente --> Concluido
+    Concluido --> [*]
+
+    class Pendente pending
+    class Concluido done
 ```
 
-A documentação oficial usa `classDef` em `stateDiagram` para definir estilos nomeados e aplicá-los a estados. Também informa limitações: `classDef` não pode ser aplicado a estados de início/fim pela forma comum e não pode ser aplicado a estados compostos ou dentro deles.
-
-## 1. O bloco Mermaid está semanticamente correto?
-
-Sim, para `Crash`, está.
+## 7.4 Aplicar uma classe a vários estados
 
 ```mermaid
-classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
+stateDiagram-v2
+    classDef comum fill:#f8fafc,color:#0f172a,stroke:#94a3b8
+    classDef problema fill:#fee2e2,color:#991b1b,stroke:#ef4444,font-weight:bold
+
+    [*] --> A
+    A --> B
+    B --> C
+    C --> Erro
+    Erro --> [*]
+
+    class A,B,C comum
+    class Erro problema
 ```
 
-Define a classe `badBadEvent` com:
+## 7.5 Aplicação inline com `:::`
 
-| Propriedade | Intenção |
+```mermaid
+stateDiagram-v2
+    classDef danger fill:#dc2626,color:#ffffff,stroke:#facc15,stroke-width:3px,font-weight:bold
+
+    [*] --> Still
+    Still --> Crash:::danger
+    Crash --> [*]
+```
+
+| Forma | Melhor uso |
 |---|---|
-| `fill:#f00` | fundo vermelho |
-| `color:white` | texto branco |
-| `font-weight:bold` | texto negrito |
-| `stroke-width:2px` | borda com 2px |
-| `stroke:yellow` | borda amarela |
+| `class Estado classe` | diagramas médios/grandes, manutenção e leitura |
+| `Estado:::classe` | exemplos curtos e aplicação direta |
 
-```mermaid
-class Crash badBadEvent
-```
+## 7.6 Limitações de `classDef` em `stateDiagram-v2`
 
-significa:
-
-```txt
-aplique a classe badBadEvent ao estado Crash
-```
-
-Logo:
-
-```txt
-Crash = fundo vermelho + texto branco + negrito + borda amarela
-```
-
-## 2. `fill` não significa sempre a mesma coisa
-
-Dentro do `classDef`:
-
-```mermaid
-fill:#f00
-```
-
-normalmente afeta o **fundo do estado**.
-
-Mas no SVG final, `fill` também pode pintar texto.
-
-| Contexto | `fill` costuma afetar |
+| Alvo | Situação |
 |---|---|
-| `classDef` aplicado ao estado | fundo/forma do estado |
-| SVG final em `text`/`tspan` | cor visual do texto |
+| Estado simples | funciona bem |
+| Vários estados simples | funciona bem |
+| Estado inicial/final `[*]` | não trate como estado comum |
+| Estado composto | limitado/não confiável para estilo direto |
+| Estado interno de composto | pode variar por versão/renderer |
 
-Se a página tem:
-
-```css
-.mermaid svg text,
-.mermaid svg tspan {
-  fill: #111;
-}
-```
-
-o texto pode ficar escuro mesmo com:
-
-```mermaid
-color:white
-```
-
-## 3. Por que fundo vermelho funciona e texto branco não?
-
-Estrutura conceitual:
-
-```html
-<g class="state badBadEvent">
-  <rect class="basic label-container"></rect>
-
-  <g class="label">
-    <text>
-      <tspan>Crash</tspan>
-    </text>
-  </g>
-</g>
-```
-
-O retângulo recebe:
-
-```css
-fill: #f00;
-```
-
-Mas o texto interno pode receber:
-
-```css
-.mermaid svg text,
-.mermaid svg tspan {
-  fill: var(--alguma-cor-global);
-}
-```
-
-Resultado:
+Exemplo problemático:
 
 ```txt
-Retângulo: vermelho ✅
-Texto: escuro ❌
+class end danger
 ```
 
-## 4. Diferença prática entre `color:white` e `fill:white`
+Essa linha não estiliza `[*]`. Ela tenta aplicar classe a um estado chamado literalmente `end`.
 
-Em HTML comum:
+## 7.7 Exemplo clássico corrigido: `badBadEvent`
 
-```css
-color: white;
-```
-
-Em SVG, frequentemente:
-
-```css
-fill: white;
-```
-
-Então, na página final, para blindar o SVG, pode ser necessário garantir:
-
-```css
-fill: #fff;
-```
-
-em:
-
-```css
-text,
-tspan,
-.label,
-.stateLabel
-```
-
-## 5. Correção errada: forçar tudo globalmente
-
-```css
-.mermaid svg text,
-.mermaid svg tspan {
-  fill: #fff !important;
-}
-```
-
-Riscos:
-
-| Elemento | Risco |
-|---|---|
-| estados normais | texto invisível em fundo claro |
-| notas | contraste ruim |
-| labels de transição | texto branco em fundo branco |
-| outros exemplos Mermaid | ficam diferentes do esperado |
-| modo claro/escuro | contraste inconsistente |
-
-## 6. Correção correta: mirar só em `.badBadEvent`
-
-```css
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .label,
-.mermaid svg .badBadEvent .stateLabel {
-  fill: #fff !important;
-  color: #fff !important;
-  font-weight: 700 !important;
-}
-```
-
-Para a forma:
-
-```css
-.mermaid svg .badBadEvent rect,
-.mermaid svg .badBadEvent .label-container {
-  fill: #f00 !important;
-  stroke: yellow !important;
-  stroke-width: 2px !important;
-}
-```
-
-Isso afeta somente elementos dentro de `.badBadEvent`.
-
-## 7. Por que usar vários seletores?
-
-A estrutura SVG varia conforme:
-
-- versão do Mermaid;
-- tipo de diagrama;
-- tema;
-- `htmlLabels`;
-- estrutura de renderização;
-- pipeline Markdown da página.
-
-| Seletor | Por que existe |
-|---|---|
-| `.badBadEvent text` | pega texto SVG direto |
-| `.badBadEvent tspan` | pega partes internas do texto |
-| `.badBadEvent .label` | pega wrapper de label |
-| `.badBadEvent .stateLabel` | pega classe semântica de label de estado |
-| `.badBadEvent rect` | pega retângulo do estado |
-| `.badBadEvent .label-container` | pega forma/caixa do label |
-
-## 8. Sobre `class end badBadEvent`
+Versão consistente, usando hexadecimal e sem tentar estilizar `end`:
 
 ```mermaid
-class end badBadEvent
-```
-
-Não estiliza o estado final.
-
-O estado final é:
-
-```mermaid
-[*]
-```
-
-`end` seria um estado comum chamado literalmente `end`.
-
-Recomendação:
-
-```mermaid
-%% remover:
-class end badBadEvent
-```
-
-ou manter apenas se existir um estado chamado `end`.
-
-## 9. `accTitle` e `accDescr` não influenciam a cor
-
-```mermaid
-accTitle: This is the accessible title
-accDescr: This is an accessible description
-```
-
-Esses comandos são para acessibilidade, não estilo visual.
-
-## 10. O tema também pode interferir
-
-Exemplo:
-
-```js
-mermaid.initialize({
-  startOnLoad: false,
-  theme: "base",
-  themeVariables: {
-    primaryColor: "#ffffff",
-    primaryTextColor: "#111111",
-    lineColor: "#64748b"
-  }
-});
-```
-
-Mas se:
-
-```txt
-fundo vermelho aparece
-texto branco não aparece
-```
-
-o suspeito principal continua sendo CSS vencendo `text/tspan/fill`.
-
-## 11. Diagnóstico no DevTools
-
-### Passo 1
-
-Inspecione `Crash`.
-
-Procure:
-
-```html
-<text>
-  <tspan>Crash</tspan>
-</text>
-```
-
-ou:
-
-```html
-<span class="nodeLabel">Crash</span>
-```
-
-### Passo 2
-
-Procure `.badBadEvent`:
-
-```html
-<g class="state badBadEvent">
-```
-
-## 12. Cenário A — `.badBadEvent` aparece no SVG
-
-Conclusão:
-
-```txt
-Mermaid entendeu o classDef ✅
-Mermaid aplicou a classe no estado ✅
-CSS final está sobrescrevendo o texto ❌
-```
-
-Correção provável:
-
-```css
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .label,
-.mermaid svg .badBadEvent .stateLabel {
-  fill: #fff !important;
-  color: #fff !important;
-  font-weight: 700 !important;
-}
-```
-
-## 13. Cenário B — `.badBadEvent` NÃO aparece no SVG
-
-O problema está antes do CSS.
-
-| Causa | Sintoma |
-|---|---|
-| Markdown alterou o bloco | `classDef` sumiu ou virou texto |
-| sanitizador removeu algo | SVG sem classes esperadas |
-| bloco renderizou como código comum | aparece como texto, não diagrama |
-| erro de parser Mermaid | console mostra erro |
-| renderização duplicada | SVG antigo sem classe fica visível |
-| bloco foi normalizado | espaços/linhas alteraram comando |
-
-## 14. Pipeline a auditar
-
-```js
-marked.parse(...)
-markdownit.render(...)
-DOMPurify.sanitize(...)
-mermaid.initialize(...)
-mermaid.run(...)
-mermaid.render(...)
-innerHTML = ...
-```
-
-E CSS:
-
-```css
-.mermaid text
-.mermaid tspan
-.markdown-body svg text
-.prose svg text
-svg text
-svg *
-pre code
-```
-
-## 15. Correção CSS base
-
-```css
-.mermaid {
-  display: block;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: visible;
-  background: transparent;
-  text-align: center;
-}
-
-.mermaid svg {
-  display: inline-block;
-  max-width: 100%;
-  height: auto;
-  overflow: visible;
-  background: transparent;
-}
-
-.mermaid svg text,
-.mermaid svg tspan {
-  font-family: inherit;
-}
-
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .label,
-.mermaid svg .badBadEvent .stateLabel {
-  fill: #fff !important;
-  color: #fff !important;
-  font-weight: 700 !important;
-}
-
-.mermaid svg .badBadEvent rect,
-.mermaid svg .badBadEvent .label-container {
-  fill: #f00 !important;
-  stroke: yellow !important;
-  stroke-width: 2px !important;
-}
-```
-
-## 16. Correção no bloco Mermaid
-
-Versão mais previsível:
-
-```mermaid
-stateDiagram
+stateDiagram-v2
     direction TB
 
-    accTitle: This is the accessible title
-    accDescr: This is an accessible description
+    accTitle: Diagrama de estados com estilos
+    accDescr: Exemplo com estado parado, movimento e colisão.
 
-    classDef notMoving fill:#ffffff,color:#111111
-    classDef movement font-style:italic
+    classDef notMoving fill:#ffffff,color:#111111,stroke:#64748b
+    classDef movement fill:#eef2ff,color:#312e81,stroke:#6366f1,font-style:italic
     classDef badBadEvent fill:#ff0000,color:#ffffff,font-weight:bold,stroke-width:2px,stroke:#ffff00
 
     [*] --> Still
@@ -3200,353 +1566,133 @@ stateDiagram
     Crash --> [*]
 
     class Still notMoving
-    class Moving,Crash movement
+    class Moving movement
+    class Crash movement
     class Crash badBadEvent
 ```
 
-| Antes | Depois | Motivo |
-|---|---|---|
-| `fill:white` | `fill:#ffffff` | mais explícito |
-| `color:white` | `color:#ffffff` | mais explícito |
-| `fill:#f00` | `fill:#ff0000` | equivalente, mais legível |
-| `stroke:yellow` | `stroke:#ffff00` | mais explícito |
-| `class end badBadEvent` | removido | não estiliza `[*]` |
+O estado `Crash` recebe duas classes: `movement` e `badBadEvent`.
 
-## 17. Diagnóstico em uma frase
+## 7.8 Tema por frontmatter
 
-> `classDef badBadEvent` está correto para `Crash`, mas a página HTML pode sobrescrever a cor do texto SVG por meio de CSS aplicado em `text`, `tspan`, `.label` ou `.stateLabel`.
+Use frontmatter quando quiser configurar um diagrama específico. Para customizar `themeVariables`, use preferencialmente `theme: base`, porque é o tema oficialmente modificável.
 
-## 18. Regra de ouro
-
-```txt
-Não forçar estilo global no Mermaid.
-Preservar o estilo que vem do próprio bloco Mermaid.
-Corrigir apenas o que o CSS da página estiver sobrescrevendo.
-```
-
-Errado:
-
-```css
-.mermaid * { fill: white !important; }
-```
-
-Certo:
-
-```css
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan {
-  fill: #fff !important;
-}
-```
-
-## Resumo mental da Aula 6
-
-```txt
-classDef badBadEvent
-   ↓
-define fundo vermelho + texto branco + borda amarela
-
-class Crash badBadEvent
-   ↓
-aplica esse estilo ao estado Crash
-
-se fundo vermelho funciona e texto branco não:
-   ↓
-classe chegou no SVG, mas texto foi sobrescrito
-
-suspeitos:
-   .mermaid text
-   .mermaid tspan
-   svg text
-   .label
-   .stateLabel
-
-correção:
-   mirar somente em .badBadEvent text/tspan
-```
-
----
-
-# Aula 7 — Como auditar e corrigir uma página HTML local-first com Markdown + Mermaid
-
-Cenário real:
-
-```txt
-HTML único
-+ CSS interno
-+ JavaScript interno
-+ Markdown
-+ blocos ```mermaid
-+ renderização local-first
-+ tema claro/escuro
-+ busca/highlight
-+ visualização/editor
-```
-
-Objetivo: corrigir com precisão, sem gambiarra global que arruma um exemplo e quebra outros.
-
-## 1. Primeiro princípio: Mermaid não é só texto, vira SVG
-
-Quando a página recebe:
-
-````md
 ```mermaid
-stateDiagram
-    classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
-    [*] --> Crash
-    Crash --> [*]
-    class Crash badBadEvent
-```
-````
-
-o fluxo típico é:
-
-```txt
-Markdown bruto
-   ↓
-parser Markdown
-   ↓
-HTML gerado
-   ↓
-detecção dos blocos Mermaid
-   ↓
-Mermaid renderiza
-   ↓
-SVG final
-   ↓
-CSS da página afeta o SVG
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: "#ffffff"
+    primaryTextColor: "#111111"
+    primaryBorderColor: "#64748b"
+    lineColor: "#64748b"
+    fontFamily: "system-ui, sans-serif"
+---
+stateDiagram-v2
+    [*] --> A
+    A --> B
+    B --> [*]
 ```
 
-## 2. O que pode quebrar em cada camada
+> Em YAML, cores hexadecimais devem ficar entre aspas, porque `#` inicia comentário.
 
-### Camada 1 — Markdown bruto
+### Variáveis úteis para `stateDiagram-v2` e diagramas próximos
 
-Problemas possíveis:
-
-| Problema | Sintoma |
+| Variável | Uso prático |
 |---|---|
-| bloco não preservado | Mermaid aparece como texto comum |
-| indentação alterada | parser Mermaid dá erro |
-| aspas/acentos mexidos | estado ou nota quebra |
-| `classDef` removido | estilo não aparece |
-| `accTitle`/`accDescr` removidos | acessibilidade some |
+| `primaryColor` | fundo base dos estados/nós |
+| `primaryTextColor` | texto principal dos estados/nós |
+| `primaryBorderColor` | borda base dos estados/nós |
+| `lineColor` | linhas, setas e conectores |
+| `fontFamily` | família tipográfica do diagrama |
+| `fontSize` | tamanho base da fonte |
+| `labelColor` | cor de labels em diagramas de estado/arestas, dependendo do renderer |
+| `altBackground` | fundo alternativo usado em áreas compostas ou agrupadas, dependendo do renderer |
+| `noteBkgColor` | fundo de notas |
+| `noteTextColor` | texto de notas |
+| `noteBorderColor` | borda de notas |
 
-### Camada 2 — Parser Markdown
+Exemplo mais completo:
 
-Exemplos:
+```mermaid
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: "#ffffff"
+    primaryTextColor: "#111111"
+    primaryBorderColor: "#64748b"
+    lineColor: "#64748b"
+    labelColor: "#111111"
+    altBackground: "#f8fafc"
+    noteBkgColor: "#fff7ed"
+    noteTextColor: "#7c2d12"
+    noteBorderColor: "#fdba74"
+    fontFamily: "system-ui, sans-serif"
+    fontSize: "16px"
+---
+stateDiagram-v2
+    direction TB
+    [*] --> Login
+    Login --> Validar: enviar credenciais
+    Validar --> Sucesso: válido
+    Validar --> Erro: inválido
+    Sucesso --> [*]
+    Erro --> Login: tentar novamente
 
-```js
-marked.parse(markdown)
+    note right of Login
+      Entrada do usuário.
+    end note
 ```
 
-ou:
+### Quando usar tema em vez de `classDef`
 
-```js
-markdownit.render(markdown)
-```
-
-O parser pode gerar:
-
-```html
-<pre><code class="language-mermaid">
-...
-</code></pre>
-```
-
-mas o JS esperar:
-
-```html
-<div class="mermaid">
-...
-</div>
-```
-
-### Camada 3 — Sanitização de HTML
-
-Exemplo:
-
-```js
-DOMPurify.sanitize(html)
-```
-
-Impactos possíveis:
-
-| Remoção | Consequência |
+| Necessidade | Melhor escolha |
 |---|---|
-| remove `class` | `.badBadEvent` não chega no SVG |
-| remove `style` | estilos inline do Mermaid podem sumir |
-| remove SVG | diagrama não aparece |
-| remove atributos ARIA/title/desc | acessibilidade piora |
+| aparência padrão do diagrama inteiro | `themeVariables` |
+| destacar um estado específico | `classDef` |
+| corrigir SVG final dentro da sua página | CSS externo específico |
+| manter o diagrama portátil para GitHub/Live Editor | `classDef` e frontmatter, evitando CSS externo |
 
-### Camada 4 — Mermaid render
+## 7.9 Configuração global via JavaScript
 
-Exemplo:
+Use `mermaid.initialize()` para configurar Mermaid no nível da página/aplicação.
 
 ```js
 mermaid.initialize({
-  startOnLoad: false
+  startOnLoad: false,
+  securityLevel: "strict", // padrão seguro; use "loose" apenas se precisar HTML em rótulos/conteúdo confiável
+  theme: "base",
+  themeVariables: {
+    primaryColor: "#ffffff",
+    primaryTextColor: "#111111",
+    primaryBorderColor: "#64748b",
+    lineColor: "#64748b",
+    labelColor: "#111111",
+    altBackground: "#f8fafc",
+    noteBkgColor: "#fff7ed",
+    noteTextColor: "#7c2d12",
+    noteBorderColor: "#fdba74",
+    fontFamily: "system-ui, sans-serif",
+    fontSize: "16px"
+  }
 });
 ```
 
-Depois:
+Recomendações:
 
-```js
-mermaid.run({ querySelector: ".mermaid" });
-```
-
-ou:
-
-```js
-mermaid.render(id, code)
-```
-
-Problemas comuns:
-
-| Problema | Sintoma |
+| Configuração | Por quê |
 |---|---|
-| renderiza antes do Markdown terminar | Mermaid não aparece |
-| renderiza duas vezes | SVG duplicado |
-| renderiza SVG antigo | correção parece não funcionar |
-| usa `startOnLoad:true` + render manual | comportamento imprevisível |
-| tema muda depois da renderização | cores desalinhadas |
-| tema claro/escuro não re-renderiza | contraste errado |
+| `startOnLoad:false` | evita renderização automática fora do seu controle |
+| `securityLevel:"strict"` | mantém HTML em rótulos codificado e reduz superfície de risco por padrão |
+| `securityLevel:"loose"` | use somente quando você controla a origem do diagrama e precisa permitir HTML/clicks em rótulos |
+| `theme:"base"` | permite `themeVariables` customizadas |
+| `fontFamily:"system-ui, sans-serif"` | funciona melhor entre Windows, Linux, macOS e mobile |
+| tema centralizado | facilita trocar claro/escuro sem regras agressivas no SVG |
 
-### Camada 5 — CSS externo da página
+## 7.10 CSS externo seguro para HTML local-first
 
-Exemplo perigoso:
-
-```css
-.mermaid svg text,
-.mermaid svg tspan {
-  fill: var(--text-color) !important;
-}
-```
-
-Resultado:
-
-```txt
-fundo vermelho funciona
-texto branco não funciona
-```
-
-## 3. Regra principal da auditoria
-
-```txt
-Nunca corrigir Mermaid com CSS global agressivo antes de saber quem está sobrescrevendo quem.
-```
-
-Evite:
-
-```css
-.mermaid * {
-  fill: white !important;
-}
-```
-
-e:
-
-```css
-.mermaid svg text {
-  fill: #111 !important;
-}
-```
-
-## 4. Ordem correta de investigação
-
-### Passo 1 — Confirmar que o bloco chega intacto
-
-```mermaid
-stateDiagram
-    classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
-    [*] --> Crash
-    Crash --> [*]
-    class Crash badBadEvent
-```
-
-Se a página alterou vírgulas, quebras de linha ou removeu `classDef`, o problema está antes do CSS.
-
-### Passo 2 — Confirmar renderização única
-
-Sintomas de renderização duplicada:
-
-```txt
-um SVG dentro de outro
-diagrama repetido
-estilo parece antigo
-evento de tema duplica diagrama
-bloco original ainda aparece junto do SVG
-```
-
-Procurar:
-
-```js
-mermaid.run();
-mermaid.run();
-```
-
-ou:
-
-```js
-renderMarkdown();
-renderMermaid();
-renderMarkdown();
-renderMermaid();
-```
-
-### Passo 3 — Confirmar se `.badBadEvent` aparece no SVG
-
-```html
-<g class="state badBadEvent">
-```
-
-Se aparece, Mermaid entendeu a classe.
-
-Se não aparece, investigar parser Markdown, sanitização, renderização, versão/configuração Mermaid ou erro de sintaxe.
-
-### Passo 4 — Confirmar quem pinta o texto
-
-Inspecione `Crash` e procure:
-
-```css
-fill
-color
-font-weight
-font-style
-```
-
-Se aparecer:
-
-```css
-fill: #111;
-```
-
-vindo de `.mermaid text` ou `svg text`, achamos o conflito.
-
-## 5. Correção cirúrgica para `badBadEvent`
-
-```css
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .label,
-.mermaid svg .badBadEvent .stateLabel {
-  fill: #fff !important;
-  color: #fff !important;
-  font-weight: 700 !important;
-}
-```
-
-Para o retângulo:
-
-```css
-.mermaid svg .badBadEvent rect,
-.mermaid svg .badBadEvent .label-container {
-  fill: #f00 !important;
-  stroke: yellow !important;
-  stroke-width: 2px !important;
-}
-```
-
-## 6. Correção de escala/tamanho
+O CSS externo deve cuidar de **layout do SVG**, não sobrescrever indiscriminadamente as cores internas do Mermaid.
 
 ```css
 .mermaid {
@@ -3565,756 +1711,339 @@ Para o retângulo:
   overflow: visible;
   background: transparent;
 }
+
+.mermaid svg text,
+.mermaid svg tspan {
+  font-family: inherit;
+}
 ```
 
-Evite:
+Esse padrão evita:
+
+| Problema | Prevenção |
+|---|---|
+| diagrama gigante | `max-width:100%` |
+| distorção | `height:auto` |
+| seta cortada | `overflow:visible` |
+| fundo indevido de `<pre>`/`code` | `background:transparent` |
+| fonte desalinhada demais | `font-family:inherit` sem forçar cor |
+
+### 7.10.1 Modo claro/escuro sem quebrar `classDef`
+
+O erro comum no modo escuro é tentar “corrigir” todos os textos Mermaid com uma regra global:
 
 ```css
+/* Não recomendado: atropela classes definidas no próprio diagrama */
+[data-theme="dark"] .mermaid svg text {
+  fill: #e5e7eb !important;
+}
+```
+
+Essa regra pode fazer um estado como `badBadEvent` perder `color:#ffffff`, ou pode deixar labels e notas com contraste errado.
+
+Prefira corrigir classes específicas que você sabe que precisam vencer o tema:
+
+```css
+[data-theme="dark"] .mermaid svg .badBadEvent text,
+[data-theme="dark"] .mermaid svg .badBadEvent tspan,
+[data-theme="dark"] .mermaid svg .badBadEvent .label,
+[data-theme="dark"] .mermaid svg .badBadEvent .stateLabel {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+}
+```
+
+E mantenha o tema global no Mermaid:
+
+```js
+const isDark = document.documentElement.dataset.theme === "dark";
+
+mermaid.initialize({
+  startOnLoad: false,
+  theme: "base",
+  themeVariables: isDark
+    ? {
+        primaryColor: "#111827",
+        primaryTextColor: "#f9fafb",
+        primaryBorderColor: "#6b7280",
+        lineColor: "#9ca3af",
+        labelColor: "#f9fafb",
+        altBackground: "#1f2937",
+        fontFamily: "system-ui, sans-serif"
+      }
+    : {
+        primaryColor: "#ffffff",
+        primaryTextColor: "#111111",
+        primaryBorderColor: "#64748b",
+        lineColor: "#64748b",
+        labelColor: "#111111",
+        altBackground: "#f8fafc",
+        fontFamily: "system-ui, sans-serif"
+      }
+});
+```
+
+### 7.10.2 Regra mental para dark mode
+
+```txt
+Tema claro/escuro geral  → themeVariables
+Correção de layout SVG   → CSS de container/SVG
+Correção de classe real  → seletor específico da classe
+Correção global de texto → evitar
+```
+
+## 7.11 CSS defensivo para uma classe específica
+
+Use CSS específico quando o CSS global da página estiver vencendo a cor do texto no SVG.
+
+```css
+.mermaid svg .badBadEvent text,
+.mermaid svg .badBadEvent tspan,
+.mermaid svg .badBadEvent .label,
+.mermaid svg .badBadEvent .stateLabel {
+  fill: #ffffff !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+.mermaid svg .badBadEvent rect {
+  fill: #ff0000 !important;
+  stroke: #ffff00 !important;
+  stroke-width: 2px !important;
+}
+```
+
+## 7.12 Anti-padrões de CSS
+
+Evite regras amplas demais:
+
+```css
+/* Não recomendado */
+.mermaid * {
+  fill: #ffffff !important;
+}
+
+/* Não recomendado */
+svg text {
+  fill: #111111 !important;
+}
+
+/* Não recomendado */
+.mermaid svg text,
+.mermaid svg tspan {
+  fill: var(--text-color) !important;
+}
+
+/* Não recomendado */
+[data-theme="dark"] .mermaid svg text {
+  fill: #e5e7eb !important;
+}
+
+/* Não recomendado */
 .mermaid svg {
   width: 100% !important;
   height: 100% !important;
 }
 ```
 
-## 7. Correção para fundo herdado
+Por quê?
 
-```css
-.mermaid,
-.markdown-body .mermaid,
-.prose .mermaid {
-  background: transparent;
-  border: 0;
-}
-```
-
-Se houver wrapper:
-
-```css
-.mermaid-rendered {
-  background: transparent;
-  border: 0;
-}
-```
-
-## 8. Correção para tema claro/escuro
-
-Evite:
-
-```css
-[data-theme="dark"] .mermaid text {
-  fill: #e5e7eb !important;
-}
-```
-
-Melhor:
-
-```css
-[data-theme="dark"] .mermaid svg text,
-[data-theme="dark"] .mermaid svg tspan {
-  font-family: inherit;
-}
-```
-
-E preservar classes:
-
-```css
-[data-theme="dark"] .mermaid svg .badBadEvent text,
-[data-theme="dark"] .mermaid svg .badBadEvent tspan,
-[data-theme="dark"] .mermaid svg .badBadEvent .label,
-[data-theme="dark"] .mermaid svg .badBadEvent .stateLabel {
-  fill: #fff !important;
-  color: #fff !important;
-}
-```
-
-## 9. Como não quebrar busca/highlight
-
-A busca não deve modificar conteúdo dentro do SVG.
-
-```js
-function shouldSkipHighlight(node) {
-  return Boolean(
-    node.closest(".mermaid") ||
-    node.closest("svg")
-  );
-}
-```
-
-Isso evita `<mark>` dentro do SVG.
-
-## 10. Como não quebrar editor/view Markdown
-
-Fluxo seguro:
-
-```txt
-Editor:
-    mantém Markdown bruto
-
-Visualização:
-    renderiza Markdown
-    converte blocos Mermaid
-    renderiza Mermaid
-
-Voltar ao editor:
-    usa Markdown original
-    não usa HTML renderizado
-```
-
-Erro clássico:
-
-```txt
-editar o HTML renderizado em vez do Markdown original
-```
-
-## 11. Organização segura do JS
-
-```js
-async function renderMarkdownView(markdown, target) {
-  const html = marked.parse(markdown);
-  target.innerHTML = html;
-  prepareMermaidBlocks(target);
-  await renderMermaid(target);
-}
-```
-
-```js
-function prepareMermaidBlocks(container) {
-  const blocks = container.querySelectorAll(
-    'pre code.language-mermaid, pre code.lang-mermaid'
-  );
-
-  blocks.forEach((codeBlock) => {
-    const pre = codeBlock.closest("pre");
-    const mermaidDiv = document.createElement("div");
-
-    mermaidDiv.className = "mermaid";
-    mermaidDiv.textContent = codeBlock.textContent;
-
-    pre.replaceWith(mermaidDiv);
-  });
-}
-```
-
-```js
-async function renderMermaid(container) {
-  const blocks = container.querySelectorAll(".mermaid");
-
-  if (!blocks.length) return;
-
-  await mermaid.run({
-    nodes: Array.from(blocks)
-  });
-}
-```
-
-## 12. Inicialização recomendada
-
-```js
-mermaid.initialize({
-  startOnLoad: false,
-  theme: "base",
-  securityLevel: "strict",
-  themeVariables: {
-    primaryColor: "#ffffff",
-    primaryTextColor: "#111111",
-    primaryBorderColor: "#64748b",
-    lineColor: "#64748b",
-    noteBkgColor: "#fff7ed",
-    noteTextColor: "#7c2d12",
-    noteBorderColor: "#fdba74"
-  }
-});
-```
-
-| Configuração | Função |
+| Anti-padrão | Risco |
 |---|---|
-| `startOnLoad:false` | evita renderização automática fora do controle |
-| `theme:"base"` | permite customização por `themeVariables` |
-| `securityLevel:"strict"` | postura mais segura por padrão |
-| `themeVariables` | define visual base sem impedir `classDef` |
+| `.mermaid *` | afeta texto, linhas, bordas, notas, marcadores e setas |
+| `svg text` global | quebra outros SVGs da página |
+| `.mermaid svg text` com `!important` | vence `classDef color` e tema Mermaid |
+| regra global de dark mode | faz funcionar no escuro, mas quebra classes específicas |
+| `width` e `height` forçados | distorce layout e pode causar sobreposição |
 
-## 13. `securityLevel: "strict"` ou `"loose"`
-
-| Modo | Uso |
-|---|---|
-| `strict` | mais seguro, recomendado como padrão defensivo |
-| `loose` | mais permissivo, pode ser necessário para alguns recursos, mas aumenta superfície de risco |
-
-Em página local-first educacional, tente manter `strict`.
-
-## 14. Checklist de auditoria antes de editar
-
-```txt
-1. Localizar todos os blocos Mermaid.
-2. Verificar como o Markdown vira HTML.
-3. Verificar se os blocos Mermaid chegam intactos.
-4. Verificar se o Mermaid inicializa uma única vez.
-5. Verificar se o SVG contém as classes esperadas.
-6. Procurar CSS global que afeta .mermaid, svg, text, tspan, rect, path.
-7. Corrigir CSS amplo demais.
-8. Adicionar CSS específico só quando necessário.
-9. Testar modo claro e escuro.
-10. Testar busca/highlight.
-11. Testar visualização Markdown.
-12. Testar editor, se existir.
-13. Testar exemplos oficiais, principalmente badBadEvent.
-14. Garantir que não houve duplicação de funções.
-15. Garantir que o comportamento original foi preservado.
-```
-
-## 15. Padrão seguro de correção
-
-```txt
-Primeiro remover interferência global.
-Depois preservar comportamento Mermaid nativo.
-Por último adicionar exceções específicas.
-```
-
-Antes:
+Correção mais segura:
 
 ```css
-.mermaid svg text {
-  fill: var(--text-color) !important;
-}
-```
-
-Depois:
-
-```css
-.mermaid svg text,
-.mermaid svg tspan {
-  font-family: inherit;
-}
-```
-
-Exceção específica:
-
-```css
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .label,
-.mermaid svg .badBadEvent .stateLabel {
-  fill: #fff !important;
-  color: #fff !important;
-}
-```
-
-## 16. O que não fazer
-
-Evitar:
-
-```css
-.mermaid * {
-  all: unset;
-}
-```
-
-```css
-.mermaid svg * {
-  fill: currentColor !important;
-}
-```
-
-```css
-svg text {
-  fill: var(--text-color) !important;
-}
-```
-
-```js
-document.body.innerHTML = document.body.innerHTML.replace(...)
-```
-
-```js
-setTimeout(() => mermaid.run(), 1000)
-```
-
-## 17. O que fazer
-
-### Bloco 1 — CSS base Mermaid
-
-```css
-.mermaid {
-  display: block;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: visible;
-  background: transparent;
-  text-align: center;
-}
-
+/* Layout geral */
 .mermaid svg {
-  display: inline-block;
   max-width: 100%;
   height: auto;
-  overflow: visible;
-  background: transparent;
-}
-```
-
-### Bloco 2 — Não forçar texto global
-
-```css
-.mermaid svg text,
-.mermaid svg tspan {
-  font-family: inherit;
-}
-```
-
-### Bloco 3 — Proteção específica
-
-```css
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .label,
-.mermaid svg .badBadEvent .stateLabel {
-  fill: #fff !important;
-  color: #fff !important;
-  font-weight: 700 !important;
 }
 
-.mermaid svg .badBadEvent rect,
-.mermaid svg .badBadEvent .label-container {
-  fill: #f00 !important;
-  stroke: yellow !important;
-  stroke-width: 2px !important;
+/* Classe específica */
+.mermaid svg .danger text,
+.mermaid svg .danger tspan {
+  fill: #ffffff !important;
 }
-```
-
-## 18. Resumo mental da Aula 7
-
-```txt
-Página local-first com Mermaid tem 5 camadas:
-
-1. Markdown bruto
-2. Parser Markdown
-3. Sanitização
-4. Mermaid render
-5. CSS final da página
-```
-
-```txt
-❌ .mermaid * { fill:white !important; }
-✅ .mermaid svg .badBadEvent text/tspan { fill:#fff !important; }
-```
-
-```txt
-entender → confirmar → corrigir escopo mínimo → testar regressão
 ```
 
 ---
 
-# Aula 8 — Checklist final de correção da página + modelo de patch CSS/JS
+# 8. Integração em Markdown, HTML e documentação
 
-Esta aula consolidou o procedimento a aplicar quando um HTML é enviado para correção.
+Mermaid pode aparecer em READMEs, wikis, issues, documentação estática, páginas HTML locais e aplicações customizadas. A regra central é separar o que é **portátil** — sintaxe Mermaid, `classDef`, `class`, frontmatter `config` — do que depende do ambiente — CSS externo, pipeline JavaScript, versão embutida e política de segurança da plataforma.
 
-A ideia é corrigir Mermaid com foco em personalização, sem quebrar:
+## 8.1 GitHub
 
-```txt
-Markdown
-visualização
-editor
-busca/highlight
-tema claro/escuro
-layout responsivo
-demais blocos de código
-demais diagramas Mermaid
-```
-
-## 1. Objetivo da correção
-
-O alvo não é “forçar o Mermaid a ficar bonito de qualquer jeito”.
-
-O alvo correto é:
-
-```txt
-Preservar a intenção visual escrita dentro do próprio bloco Mermaid.
-```
-
-Exemplo:
-
-```mermaid
-classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
-class Crash badBadEvent
-```
-
-| Parte | Resultado esperado |
-|---|---|
-| `fill:#f00` | fundo vermelho |
-| `color:white` | texto branco |
-| `font-weight:bold` | texto negrito |
-| `stroke-width:2px` | borda grossa |
-| `stroke:yellow` | borda amarela |
-
-Se a página mostra fundo vermelho, mas não mostra texto branco, o problema provavelmente está na **camada CSS/SVG final**, não na sintaxe Mermaid.
-
-## 2. Checklist de auditoria no HTML
-
-### 2.1 Localizar blocos Mermaid
-
-Procurar:
-
-```html
-<pre><code class="language-mermaid">
-```
-
-```html
-<code class="lang-mermaid">
-```
-
-```html
-<div class="mermaid">
-```
-
-```js
-mermaid.render(...)
-mermaid.run(...)
-mermaid.initialize(...)
-```
-
-### 2.2 Verificar se o Markdown preserva o bloco original
-
-Exemplo correto:
+Use bloco Markdown cercado com `mermaid`:
 
 ````md
 ```mermaid
-stateDiagram
-    direction TB
-    classDef badBadEvent fill:#f00,color:white,font-weight:bold,stroke-width:2px,stroke:yellow
-    [*] --> Crash
-    Crash --> [*]
-    class Crash badBadEvent
+flowchart TD
+    A[Início] --> B[Fim]
 ```
 ````
 
-Problemas:
+Cuidados:
 
-| Problema | Efeito |
+| Ponto | Recomendação |
 |---|---|
-| parser remove `classDef` | estilo some |
-| parser altera quebras de linha | Mermaid pode falhar |
-| sanitizador remove `class` | SVG perde seletor |
-| busca/highlight injeta `<mark>` | SVG/Markdown pode quebrar |
-| renderização dupla | visual fica inconsistente |
+| Compatibilidade | teste no próprio GitHub, não apenas no Live Editor |
+| Segurança | GitHub sanitiza/renderiza o SVG conforme política própria |
+| Portabilidade | evite depender de CSS externo para o diagrama funcionar |
 
-### 2.3 Verificar inicialização do Mermaid
+> **Nota importante:** `classDef`, `class` e `:::` são portáveis no GitHub porque fazem parte da sintaxe Mermaid do próprio bloco. O que não é portátil é depender de CSS externo da sua página, como `.mermaid svg .danger text { ... }`, porque o GitHub controla o ambiente de renderização e sanitização.
 
-```js
-mermaid.initialize({
-  startOnLoad: true
-});
+## 8.2 GitLab
+
+GitLab também suporta blocos `mermaid`, mas a versão Mermaid pode ser diferente da versão oficial mais recente. Ao publicar documentação para GitLab, valide no GitLab real.
+
+## 8.3 Obsidian
+
+Em notas Obsidian, use bloco `mermaid`. O resultado pode variar com tema, versão do app e plugins. Para guias públicos, evite exemplos que dependam de CSS externo do vault.
+
+## 8.4 VS Code
+
+O VS Code normalmente precisa de extensão para preview Mermaid. Exemplos comuns:
+
+```txt
+Markdown Preview Mermaid Support
+Mermaid Markdown Syntax Highlighting
+Mermaid Preview
 ```
 
-ou:
+A extensão pode embutir uma versão Mermaid específica. Se algo funciona no Live Editor e falha no VS Code, compare versões.
 
-```js
-mermaid.initialize({
-  startOnLoad: false
-});
+## 8.5 Docusaurus
+
+Docusaurus possui tema dedicado para Mermaid:
+
+```bash
+npm install --save @docusaurus/theme-mermaid
 ```
 
-Para Markdown/view/editor, normalmente é melhor:
+Uso conceitual:
 
 ```js
-mermaid.initialize({
-  startOnLoad: false
-});
+module.exports = {
+  themes: ["@docusaurus/theme-mermaid"],
+  markdown: {
+    mermaid: true
+  }
+};
 ```
 
-Assim a página decide **quando** renderizar.
+## 8.6 VitePress
 
-### 2.4 Verificar se o SVG recebe a classe
+VitePress costuma depender de plugin ou integração customizada. Pontos de atenção:
 
-Depois do render, `Crash` deveria gerar algo como:
+| Ponto | Risco |
+|---|---|
+| SSR/build | Mermaid depende de DOM em alguns fluxos |
+| tema claro/escuro | pode exigir re-renderização ou tema dinâmico |
+| versão Mermaid | controlada pelo pacote instalado |
+
+## 8.7 MkDocs Material
+
+MkDocs Material oferece integração para diagramas em Markdown. É útil para documentação técnica publicada como site estático.
+
+## 8.8 `marked`, `markdown-it` e `remark`
+
+Se você constrói sua própria página HTML local-first, o parser Markdown geralmente transforma:
+
+```txt
+```mermaid
+flowchart TD
+    A --> B
+```
+```
+
+em algo parecido com:
 
 ```html
-<g class="state badBadEvent">
+<pre><code class="language-mermaid">flowchart TD
+    A --> B</code></pre>
 ```
 
-Se `.badBadEvent` aparece:
+Você precisa converter esse bloco em um container que o Mermaid consiga processar:
+
+```html
+<pre class="mermaid">flowchart TD
+    A --> B</pre>
+```
+
+## 8.9 Pipeline local-first recomendado
 
 ```txt
-Mermaid entendeu o classDef.
-O CSS final provavelmente está sobrescrevendo o texto.
+Markdown bruto
+   ↓
+Parser Markdown
+   ↓
+Detectar code blocks language-mermaid
+   ↓
+Criar containers .mermaid
+   ↓
+Executar mermaid.run()
+   ↓
+Aplicar CSS seguro
+   ↓
+Exibir SVG final
 ```
 
-Se `.badBadEvent` não aparece:
+## 8.10 Renderização segura com `mermaid.run`
 
-```txt
-O problema está antes do CSS:
-Markdown, sanitização, renderização, parser ou erro Mermaid.
-```
-
-## 3. Checklist CSS: seletores perigosos
-
-Procurar:
-
-```css
-.mermaid text
-.mermaid tspan
-.mermaid svg text
-.mermaid svg tspan
-svg text
-svg tspan
-svg *
-.markdown-body svg text
-.prose svg text
-pre code
-code
-```
-
-Maior suspeito:
-
-```css
-.mermaid svg text,
-.mermaid svg tspan {
-  fill: var(--text-color) !important;
-}
-```
-
-## 4. Modelo de patch CSS seguro
-
-### 4.1 Base Mermaid: proporção, overflow e fundo
-
-```css
-/* Mermaid: container seguro para página local-first */
-.mermaid {
-  display: block;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: visible;
-  background: transparent;
-  text-align: center;
-}
-
-/* SVG Mermaid: preserva proporção natural */
-.mermaid svg {
-  display: inline-block;
-  max-width: 100%;
-  height: auto;
-  overflow: visible;
-  background: transparent;
-}
-```
-
-| Sintoma | Causa comum |
-|---|---|
-| diagrama gigante | `width/height` forçado |
-| diagrama distorcido | `height:100%` junto com `width:100%` |
-| seta cortada | `overflow:hidden` |
-| fundo indevido | herança de `pre/code` |
-
-### 4.2 Não forçar cor global do texto Mermaid
-
-Evitar:
-
-```css
-.mermaid svg text,
-.mermaid svg tspan {
-  fill: var(--text-color) !important;
-}
-```
-
-Mais seguro:
-
-```css
-/* Preserve fonte, mas não destrua as cores do Mermaid/classDef */
-.mermaid svg text,
-.mermaid svg tspan {
-  font-family: inherit;
-}
-```
-
-Regra mental:
-
-```txt
-Fonte pode herdar.
-Cor não deve ser forçada globalmente.
-```
-
-### 4.3 Preservar especificamente `badBadEvent`
-
-```css
-/* Preserva texto branco definido pela classe Mermaid badBadEvent */
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .label,
-.mermaid svg .badBadEvent .stateLabel {
-  fill: #fff !important;
-  color: #fff !important;
-  font-weight: 700 !important;
-}
-
-/* Preserva fundo vermelho e borda amarela */
-.mermaid svg .badBadEvent rect,
-.mermaid svg .badBadEvent .label-container {
-  fill: #f00 !important;
-  stroke: yellow !important;
-  stroke-width: 2px !important;
-}
-```
-
-Isso é uma correção **cirúrgica**: só afeta elementos dentro de `.badBadEvent`.
-
-## 5. Modelo de patch JS seguro
-
-Se o problema estiver no pipeline:
+Em Mermaid 10+, `mermaid.run()` é a forma preferível para renderizar elementos Mermaid já presentes no DOM.
 
 ```js
-function prepareMermaidBlocks(container) {
-  const blocks = container.querySelectorAll(
-    'pre code.language-mermaid, pre code.lang-mermaid'
-  );
+import mermaid from "mermaid";
 
-  blocks.forEach((codeBlock, index) => {
-    const pre = codeBlock.closest('pre');
-    if (!pre) return;
-
-    const mermaidDiv = document.createElement('div');
-    mermaidDiv.className = 'mermaid';
-    mermaidDiv.textContent = codeBlock.textContent.trim();
-
-    pre.replaceWith(mermaidDiv);
-  });
-}
-
-async function renderMermaidBlocks(container) {
-  const blocks = Array.from(container.querySelectorAll('.mermaid'));
-  if (!blocks.length || typeof mermaid === 'undefined') return;
-
-  await mermaid.run({
-    nodes: blocks
-  });
-}
-```
-
-Fluxo geral:
-
-```js
-async function renderMarkdownView(markdown, target) {
-  const html = marked.parse(markdown);
-
-  target.innerHTML = html;
-
-  prepareMermaidBlocks(target);
-
-  await renderMermaidBlocks(target);
-}
-```
-
-A ideia:
-
-```txt
-1. Markdown vira HTML.
-2. Blocos code.language-mermaid viram div.mermaid.
-3. Mermaid renderiza uma vez.
-```
-
-## 6. Inicialização Mermaid recomendada
-
-```js
 mermaid.initialize({
   startOnLoad: false,
-  theme: 'base',
-  securityLevel: 'strict',
-  themeVariables: {
-    primaryColor: '#ffffff',
-    primaryTextColor: '#111111',
-    primaryBorderColor: '#64748b',
-    lineColor: '#64748b',
-    noteBkgColor: '#fff7ed',
-    noteTextColor: '#7c2d12',
-    noteBorderColor: '#fdba74'
-  }
+  theme: "base"
 });
+
+await mermaid.run({ querySelector: ".mermaid" });
 ```
 
-| Opção | Motivo |
-|---|---|
-| `startOnLoad:false` | evita renderização fora de controle |
-| `theme:'base'` | permite customização por `themeVariables` |
-| `securityLevel:'strict'` | postura defensiva inicial |
-| `themeVariables` | define aparência geral sem atropelar `classDef` |
+### 8.10.1 `mermaid.run()` vs `mermaid.render()`
 
-## 7. Tratamento do modo claro/escuro
+| API | Quando usar | Como funciona |
+|---|---|---|
+| `mermaid.run()` | renderizar elementos `.mermaid` já existentes no DOM | o Mermaid encontra os nós e substitui/renderiza o conteúdo |
+| `mermaid.render()` | renderização customizada a partir de string | retorna `{ svg, bindFunctions }`; você injeta o SVG manualmente |
+| `mermaid.init()` | legado | deprecated em Mermaid 10; prefira `run()` |
 
-Evitar:
-
-```css
-[data-theme="dark"] .mermaid svg text {
-  fill: #e5e7eb !important;
-}
-```
-
-Melhor:
-
-```css
-[data-theme="dark"] .mermaid svg text,
-[data-theme="dark"] .mermaid svg tspan {
-  font-family: inherit;
-}
-```
-
-E manter exceção específica:
-
-```css
-[data-theme="dark"] .mermaid svg .badBadEvent text,
-[data-theme="dark"] .mermaid svg .badBadEvent tspan,
-[data-theme="dark"] .mermaid svg .badBadEvent .label,
-[data-theme="dark"] .mermaid svg .badBadEvent .stateLabel {
-  fill: #fff !important;
-  color: #fff !important;
-}
-```
-
-Regra mental:
-
-```txt
-O modo escuro muda o tema geral.
-Ele não deve anular estilos explícitos do diagrama.
-```
-
-## 8. Tratamento da busca/highlight
-
-A busca não deve modificar conteúdo dentro do SVG Mermaid.
+Uso recomendado para página Markdown local-first:
 
 ```js
-function shouldSkipHighlight(node) {
-  return Boolean(
-    node.closest('.mermaid') ||
-    node.closest('svg')
-  );
-}
+mermaid.initialize({ startOnLoad: false });
+await mermaid.run({ nodes: document.querySelectorAll(".mermaid") });
 ```
 
-Se a busca injeta `<mark>` dentro de `<svg>`, pode quebrar:
-
-| Elemento | Risco |
-|---|---|
-| `<text>` | desalinhamento |
-| `<tspan>` | texto quebrado |
-| `<g>` | estrutura inválida |
-| classe `.badBadEvent` | estilo pode parar de aplicar |
-
-## 9. Tratamento de renderização duplicada
-
-Evitar:
+Uso customizado com `render()`:
 
 ```js
-mermaid.run();
-mermaid.run();
+const graphDefinition = `flowchart TD
+    A[Início] --> B[Fim]`;
+
+const container = document.querySelector("#graphDiv");
+
+let renderCount = 0;
+const renderId = `mermaid-render-${++renderCount}`;
+const { svg, bindFunctions } = await mermaid.render(renderId, graphDefinition);
+
+container.innerHTML = svg;
+bindFunctions?.(container);
 ```
 
-ou:
+### 8.10.2 Padrão para evitar renderização duplicada
 
-```js
-renderMarkdown();
-renderMermaid();
-renderMarkdown();
-renderMermaid();
-```
-
-Correção ideal:
+Esse padrão é crítico em páginas que alternam entre editor/preview, trocam tema claro/escuro, fazem busca com highlight, recarregam Markdown ou re-renderizam conteúdo dinâmico.
 
 ```js
 let mermaidRenderToken = 0;
@@ -4329,197 +2058,657 @@ async function safeRenderMermaid(container) {
   if (token !== mermaidRenderToken) return;
 
   await mermaid.run({
-    nodes: Array.from(container.querySelectorAll('.mermaid'))
+    nodes: Array.from(container.querySelectorAll(".mermaid"))
   });
 }
 ```
 
-Ajuda quando a página troca rapidamente:
+Modelo mental:
 
 ```txt
-editor ↔ visualização
-tema claro ↔ escuro
-busca ↔ limpeza de busca
+Render 1 começa
+Render 2 começa logo depois
+Render 1 termina atrasado
+Token detecta que Render 1 ficou velho
+Render 1 não sobrescreve Render 2
 ```
 
-## 10. O que remover/corrigir se encontrar
+### 8.10.3 Preparando blocos `language-mermaid`
 
-### 10.1 CSS agressivo
+Exemplo de função defensiva para transformar blocos Markdown em containers Mermaid:
 
-```css
-svg text {
-  fill: var(--text-color) !important;
+```js
+function prepareMermaidBlocks(container) {
+  const codeBlocks = container.querySelectorAll("pre > code.language-mermaid");
+
+  for (const code of codeBlocks) {
+    const pre = code.parentElement;
+    const mermaidBlock = document.createElement("pre");
+
+    mermaidBlock.className = "mermaid";
+    mermaidBlock.textContent = code.textContent.trim();
+
+    pre.replaceWith(mermaidBlock);
+  }
 }
 ```
 
-ou:
+### 8.10.4 `try/catch` com fallback visível ao usuário
 
-```css
-.mermaid * {
-  fill: currentColor !important;
+Não deixe o usuário olhando para um espaço vazio. Em HTML de produção, mostre uma mensagem clara e preserve o código original para debug.
+
+```js
+async function renderMermaidWithFallback(container) {
+  try {
+    await safeRenderMermaid(container);
+  } catch (error) {
+    console.error("Erro ao renderizar Mermaid:", error);
+
+    const failedBlocks = container.querySelectorAll(".mermaid");
+
+    for (const block of failedBlocks) {
+      if (block.querySelector("svg")) continue;
+
+      const original = block.textContent;
+      const fallback = document.createElement("div");
+      fallback.className = "mermaid-error";
+      fallback.setAttribute("role", "alert");
+      fallback.innerHTML = `
+        <strong>Não foi possível renderizar este diagrama Mermaid.</strong>
+        <p>Teste o bloco no Mermaid Live Editor e verifique a sintaxe.</p>
+        <pre><code></code></pre>
+      `;
+      fallback.querySelector("code").textContent = original;
+      block.replaceWith(fallback);
+    }
+  }
 }
 ```
 
-Correção: remover ou restringir.
-
-### 10.2 Escala agressiva
+CSS simples para fallback:
 
 ```css
-.mermaid svg {
-  width: 100% !important;
-  height: 100% !important;
+.mermaid-error {
+  border: 1px solid #ef4444;
+  background: #fef2f2;
+  color: #7f1d1d;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  overflow-x: auto;
 }
 ```
 
-Correção:
+### 8.10.5 Re-render após troca de tema
 
-```css
-.mermaid svg {
-  max-width: 100%;
-  height: auto;
+Se a página troca `data-theme`, não renderize duas vezes sem controle. Atualize o tema, incremente o token e renderize novamente.
+
+```js
+async function applyThemeAndRender(container, themeName) {
+  document.documentElement.dataset.theme = themeName;
+
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: "base",
+    themeVariables: themeName === "dark"
+      ? {
+          primaryColor: "#111827",
+          primaryTextColor: "#f9fafb",
+          primaryBorderColor: "#6b7280",
+          lineColor: "#9ca3af",
+          labelColor: "#f9fafb",
+          fontFamily: "system-ui, sans-serif"
+        }
+      : {
+          primaryColor: "#ffffff",
+          primaryTextColor: "#111111",
+          primaryBorderColor: "#64748b",
+          lineColor: "#64748b",
+          labelColor: "#111111",
+          fontFamily: "system-ui, sans-serif"
+        }
+  });
+
+  await safeRenderMermaid(container);
 }
 ```
 
-### 10.3 Fundo herdado de código
+---
 
-```css
-.markdown-body pre,
-.markdown-body code {
-  background: var(--code-bg);
-}
+# 9. Debugging e solução de problemas
+
+Debugging em Mermaid precisa separar quatro camadas: **sintaxe**, **parser Markdown**, **renderização JavaScript** e **CSS/SVG final**. Essa separação evita corrigir o código Mermaid quando o problema está no ambiente, ou culpar o CSS quando o diagrama nem foi parseado corretamente.
+
+## 9.1 Protocolo rápido de diagnóstico
+
+```txt
+1. Copie o bloco para o Mermaid Live Editor.
+2. Confirme se o erro é de sintaxe Mermaid ou do ambiente final.
+3. Reduza o diagrama para o menor exemplo que ainda falha.
+4. Verifique a primeira linha: flowchart, sequenceDiagram, stateDiagram-v2 etc.
+5. Verifique indentação, aspas, chaves e comentários.
+6. Teste no ambiente final: GitHub, GitLab, VS Code, HTML próprio etc.
+7. Abra o console do navegador se for HTML próprio.
+8. Inspecione o SVG no DevTools se o problema for visual.
 ```
 
-Se atingir Mermaid:
+## 9.2 Como diferenciar erro de sintaxe e erro visual
 
-```css
-.markdown-body .mermaid {
-  background: transparent;
-  border: 0;
-}
-```
-
-### 10.4 `class end badBadEvent`
-
-```mermaid
-class end badBadEvent
-```
-
-Não estiliza `[*]`. Deve ser removido se o objetivo for manter o exemplo correto e limpo.
-
-## 11. Versão limpa do bloco base
-
-```mermaid
-stateDiagram
-    direction TB
-
-    accTitle: This is the accessible title
-    accDescr: This is an accessible description
-
-    classDef notMoving fill:#ffffff,color:#111111
-    classDef movement font-style:italic
-    classDef badBadEvent fill:#ff0000,color:#ffffff,font-weight:bold,stroke-width:2px,stroke:#ffff00
-
-    [*] --> Still
-    Still --> [*]
-    Still --> Moving
-    Moving --> Still
-    Moving --> Crash
-    Crash --> [*]
-
-    class Still notMoving
-    class Moving,Crash movement
-    class Crash badBadEvent
-```
-
-| Antes | Depois | Motivo |
+| Sintoma | Causa provável | Caminho de correção |
 |---|---|---|
-| `white` | `#ffffff` | mais explícito |
-| `#f00` | `#ff0000` | mais legível |
-| `yellow` | `#ffff00` | mais explícito |
-| `class end badBadEvent` | removido | não estiliza `[*]` |
+| Diagrama não aparece | sintaxe inválida ou renderer não rodou | Live Editor + console |
+| Aparece como texto | Markdown não converteu bloco `mermaid` | pipeline Markdown |
+| Fundo muda, texto não | CSS sobrescreveu `text/tspan` | DevTools + CSS específico |
+| Diagrama gigante | CSS forçou `width/height` | corrigir escala do SVG |
+| Linha sobrepõe caixa | layout recalculado antes da fonte/CSS | re-renderizar após layout estabilizar |
+| Funciona no Live Editor, falha no GitLab | versão Mermaid diferente | testar sintaxe compatível |
 
-## 12. Critérios de aceite
+## 9.3 Erros comuns de sintaxe
 
-| Critério | Resultado esperado |
-|---|---|
-| Markdown comum | continua renderizando |
-| blocos de código comuns | continuam com estilo de código |
-| blocos Mermaid | renderizam como diagrama |
-| exemplo `badBadEvent` | `Crash` com fundo vermelho, texto branco, negrito e borda amarela |
-| `Still` | fundo branco conforme `notMoving` |
-| `Moving` | itálico conforme `movement` |
-| estado final `[*]` | não depende de `class end` |
-| tema claro | contraste preservado |
-| tema escuro | contraste preservado |
-| busca/highlight | não quebra SVG Mermaid |
-| layout | não fica gigante/desproporcional |
-| setas | não ficam cortadas |
-| JS | sem renderização duplicada |
-| W3C | sem inserir HTML inválido desnecessário |
-
-## 13. Modelo mental final da correção
+### Tipo de diagrama errado
 
 ```txt
-Se o bloco Mermaid está correto,
-não corrija o bloco primeiro.
-
-1. Veja se o bloco chega intacto.
-2. Veja se o SVG recebe a classe.
-3. Veja se o CSS está sobrescrevendo.
-4. Corrija o menor seletor possível.
-5. Teste tema, busca e renderização.
+statediagram-v2
 ```
 
-Para o caso estudado:
+Correto:
 
 ```txt
-Crash vermelho + texto escuro
-=
-classDef chegou no retângulo,
-mas CSS/SVG do texto venceu a cor.
+stateDiagram-v2
 ```
 
-Correção provável:
+### Fragmentos inválidos em blocos `mermaid`
 
-```css
-.mermaid svg .badBadEvent text,
-.mermaid svg .badBadEvent tspan,
-.mermaid svg .badBadEvent .label,
-.mermaid svg .badBadEvent .stateLabel {
-  fill: #fff !important;
-  color: #fff !important;
+Não coloque fragmentos isolados como bloco renderizável:
+
+````md
+```mermaid
+direction TB
+```
+````
+
+Use `txt` para fragmentos:
+
+````md
+```txt
+direction TB
+```
+````
+
+### Comentário problemático
+
+Evite comentários com chaves ou diretivas antigas dentro de comentário:
+
+```txt
+%% evite comentários com { } quando estiver depurando erro estranho
+```
+
+### Palavra reservada ou problemática
+
+Em alguns diagramas, termos como `end` podem ter significado especial. Se um rótulo textual quebrar o diagrama, coloque entre aspas ou troque o ID interno.
+
+## 9.4 Usando `mermaid.parse` em integração própria
+
+Em aplicações customizadas, valide antes de renderizar:
+
+```js
+let renderCount = 0;
+
+try {
+  await mermaid.parse(source);
+
+  // Nunca use um ID fixo reaproveitado em renderizações repetidas.
+  // O ID informado pode aparecer no SVG final e deve ser único por chamada.
+  const renderId = `mermaid-render-${++renderCount}`;
+  const { svg, bindFunctions } = await mermaid.render(renderId, source);
+
+  container.innerHTML = svg;
+  bindFunctions?.(container);
+} catch (error) {
+  container.innerHTML = `<pre class="mermaid-error" role="alert"></pre>`;
+  container.querySelector(".mermaid-error").textContent = `Erro Mermaid: ${error.message}`;
 }
 ```
 
----
+### 9.4.1 Por que evitar ID fixo em `mermaid.render()`
 
-# Referências oficiais
+O primeiro argumento de `mermaid.render(id, source)` identifica a renderização e pode influenciar IDs internos no SVG gerado. Em páginas com múltiplos diagramas, troca de tema, preview/editor ou re-renderização dinâmica, um ID fixo reaproveitado vira uma armadilha: duas renderizações podem disputar o mesmo identificador. Prefira contador, `crypto.randomUUID()` quando disponível, ou uma combinação de timestamp e sufixo aleatório.
 
-- Mermaid — State diagrams: <https://mermaid.js.org/syntax/stateDiagram.html>
-- Mermaid — Theming: <https://mermaid.js.org/config/theming.html>
-- Mermaid — Directives: <https://mermaid.js.org/config/directives.html>
-- Mermaid — Accessibility: <https://mermaid.js.org/config/accessibility.html>
-- Mermaid — Usage: <https://mermaid.js.org/config/usage.html>
-- MDN — SVG `fill`: <https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/fill>
+Opção com `crypto.randomUUID()`:
 
----
+```js
+const renderId = `mermaid-${crypto.randomUUID()}`;
+const { svg } = await mermaid.render(renderId, source);
+```
 
-# Checklist rápido final
+Fallback sem `crypto.randomUUID()`:
+
+```js
+const renderId = `mermaid-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+const { svg } = await mermaid.render(renderId, source);
+```
+
+## 9.5 Debug visual no DevTools
+
+Quando o diagrama renderiza, mas a aparência está errada:
 
 ```txt
-1. Use classDef para estilo interno.
-2. Use class para aplicar estilos em estados.
-3. Use ::: para aplicações inline.
-4. Use direction para layout.
-5. Use accTitle/accDescr para acessibilidade.
-6. Não trate [*] como estado comum.
-7. Não use class end achando que estiliza o final.
-8. Não force .mermaid text globalmente.
-9. Inspecione text/tspan no DevTools.
-10. Preserve classDef antes de escrever CSS externo.
-11. Use CSS específico quando necessário.
-12. Evite renderização Mermaid duplicada.
-13. Preserve Markdown bruto no editor.
-14. Não injete <mark> dentro de SVG.
-15. Teste claro/escuro, busca, editor e preview.
+1. Clique com botão direito no texto/estado problemático.
+2. Inspecione o elemento SVG.
+3. Procure <text>, <tspan>, <rect>, <path> e classes aplicadas.
+4. Veja no painel Computed qual regra venceu.
+5. Remova CSS global suspeito.
+6. Use CSS específico somente para a classe afetada.
 ```
+
+Seletores suspeitos:
+
+```css
+svg text
+svg tspan
+.mermaid text
+.mermaid tspan
+.markdown-body svg text
+.prose svg text
+.mermaid .label
+.mermaid .stateLabel
+```
+
+## 9.6 Checklist específico para `badBadEvent`
+
+```txt
+1. A classe badBadEvent aparece no SVG?
+2. O estado correto recebeu class Crash badBadEvent?
+3. O fundo vermelho funciona?
+4. O texto branco falha?
+5. Existe CSS global forçando fill em text/tspan?
+6. A correção mira apenas .badBadEvent text/tspan?
+7. As cores estão em hexadecimal?
+8. Não existe class end badBadEvent tentando estilizar [*]?
+```
+
+---
+
+# 10. Acessibilidade
+
+## 10.1 Use `accTitle` e `accDescr`
+
+`accTitle` e `accDescr` adicionam título e descrição acessíveis ao SVG gerado. Eles não substituem uma explicação textual humana, mas melhoram a semântica do diagrama.
+
+Exemplo com descrição em linha única:
+
+```mermaid
+flowchart TD
+    accTitle: Fluxo de decisão de publicação
+    accDescr: Diagrama mostra revisão, aprovação, correção e publicação de um documento.
+
+    A[Revisar] --> B{Aprovado?}
+    B -->|Sim| C[Publicar]
+    B -->|Não| D[Corrigir]
+    D --> A
+```
+
+Exemplo com `accDescr` multilinha:
+
+```mermaid
+stateDiagram-v2
+    accTitle: Ciclo de vida de um processamento
+    accDescr {
+      Diagrama com três estados principais: Parado, EmProcessamento e Falha.
+      O fluxo inicia em Parado, pode processar com sucesso ou falhar,
+      e permite nova tentativa após uma falha.
+    }
+
+    [*] --> Parado
+    Parado --> EmProcessamento: iniciar
+    EmProcessamento --> Parado: sucesso
+    EmProcessamento --> Falha: erro
+    Falha --> Parado: tentar novamente
+```
+
+Boas práticas:
+
+| Elemento | Recomendação |
+|---|---|
+| `accTitle` | curto, objetivo, nome do diagrama |
+| `accDescr` | descreva fluxo, estados e decisões principais |
+| Descrição textual fora do diagrama | obrigatória para diagramas complexos em guia público |
+| Texto dentro de nós | não dependa apenas do SVG para transmitir informação crítica |
+
+## 10.2 Descrição textual alternativa
+
+Para diagramas complexos, inclua uma explicação em texto logo antes ou depois do diagrama.
+
+Exemplo:
+
+```md
+O fluxo começa em Revisar. Se aprovado, segue para Publicar. Se não aprovado, volta para Corrigir e depois retorna para Revisar.
+```
+
+## 10.3 Contraste de cores
+
+Para texto normal, mire contraste mínimo **4.5:1** conforme WCAG AA. Para texto grande, o mínimo é menor, mas a regra prática para documentação pública é manter 4.5:1 sempre que possível.
+
+| Combinação | Status prático |
+|---|---|
+| texto `#111111` em fundo `#ffffff` | bom |
+| texto `#ffffff` em fundo `#dc2626` | bom na maioria dos casos |
+| texto cinza claro em fundo branco | risco alto |
+| texto colorido em fundo colorido claro | testar contraste |
+
+## 10.4 Não dependa só de cor
+
+Não use apenas vermelho/verde para comunicar significado. Combine cor com texto, rótulo, borda ou nota.
+
+Exemplo:
+
+```mermaid
+stateDiagram-v2
+    classDef success fill:#dcfce7,color:#166534,stroke:#22c55e,stroke-width:2px
+    classDef danger fill:#fee2e2,color:#991b1b,stroke:#ef4444,stroke-width:2px,font-weight:bold
+
+    [*] --> Validar
+    Validar --> Aprovado: válido
+    Validar --> Reprovado: inválido
+    Aprovado --> [*]
+    Reprovado --> [*]
+
+    class Aprovado success
+    class Reprovado danger
+```
+
+## 10.5 `aria-label` no container
+
+Quando você controla o HTML, pode acrescentar contexto no container. Isso não substitui `accTitle`/`accDescr`, mas ajuda em páginas customizadas.
+
+```html
+<div class="diagram-wrapper" aria-label="Diagrama de estados do fluxo de autenticação">
+  <pre class="mermaid">
+stateDiagram-v2
+    [*] --> Login
+    Login --> Dashboard
+    Dashboard --> [*]
+  </pre>
+</div>
+```
+
+## 10.6 Como testar
+
+| Teste | Ferramenta/ação |
+|---|---|
+| Leitura por tecnologia assistiva | NVDA, JAWS, VoiceOver ou leitor disponível no sistema |
+| Estrutura do SVG | DevTools: verificar `<title>`, `<desc>`, `aria-labelledby`, `aria-describedby` |
+| Contraste | WebAIM Contrast Checker ou ferramenta equivalente |
+| Navegação sem visão do diagrama | ler a descrição textual alternativa |
+| Tema claro/escuro | validar contraste nos dois modos |
+
+---
+
+# 11. Boas práticas para guia público
+
+## 11.1 Estrutura editorial recomendada
+
+Um guia público deve ser organizado por **tarefa e consulta**, não por histórico de aulas.
+
+Boa estrutura:
+
+```txt
+Introdução
+Quick Start
+Tipos de diagrama
+Referência do tipo principal
+Personalização
+Integração
+Debugging
+Acessibilidade
+Checklist
+Referências
+```
+
+Estrutura menos adequada para referência:
+
+```txt
+Aula 1
+Aula 2
+Aula 3
+...
+```
+
+## 11.2 Reduza repetição
+
+Em vez de repetir o mesmo exemplo vinte vezes, mantenha:
+
+| Conteúdo | Melhor local |
+|---|---|
+| exemplo `badBadEvent` | seção única de referência/diagnóstico |
+| tabela de `classDef` | seção única de personalização |
+| pipeline Markdown → SVG | seção única de integração |
+| checklist final | uma seção final completa |
+
+## 11.3 Use exemplos completos em blocos `mermaid`
+
+Todo bloco marcado como `mermaid` deve ser renderizável sozinho.
+
+Errado:
+
+````md
+```mermaid
+direction TB
+```
+````
+
+Certo:
+
+````md
+```txt
+direction TB
+```
+````
+
+Ou:
+
+````md
+```mermaid
+stateDiagram-v2
+    direction TB
+    [*] --> A
+    A --> [*]
+```
+````
+
+## 11.4 Padronize cores
+
+Use hexadecimal em exemplos públicos.
+
+| Evite | Prefira |
+|---|---|
+| `white` | `#ffffff` |
+| `yellow` | `#ffff00` |
+| `red` | `#ff0000` |
+| `#fff` | `#ffffff` em material didático |
+
+## 11.5 Documente versão e ambiente
+
+Inclua no topo:
+
+```txt
+Testado com Mermaid 11.14.0.
+Validar novamente em ambientes que usem Mermaid 10 ou renderizadores próprios.
+```
+
+## 11.6 Separe sintaxe, tema e CSS
+
+Não misture responsabilidades.
+
+| Camada | Responsabilidade |
+|---|---|
+| Mermaid | estrutura e estilo portátil do diagrama |
+| ThemeVariables | aparência geral do renderizador |
+| CSS externo | integração visual na página final |
+| JS | momento e estratégia de renderização |
+
+---
+
+# 12. Checklist final de publicação
+
+## 12.1 Conteúdo
+
+- [ ] O guia explica o que é Mermaid.
+- [ ] O guia tem Quick Start antes de conteúdo avançado.
+- [ ] A versão Mermaid usada está documentada.
+- [ ] O escopo está claro: tipos principais cobertos com profundidade adequada e `stateDiagram-v2` com referência completa.
+- [ ] Existem exemplos dos principais tipos de diagrama.
+- [ ] `stateDiagram-v2` está explicado de forma completa.
+- [ ] `stateDiagram` vs `stateDiagram-v2` está explicado sem ambiguidade.
+- [ ] A seção de integração cobre GitHub, GitLab, VS Code, Obsidian, HTML e documentação estática.
+- [ ] A seção de debugging cobre sintaxe, parser, ambiente e CSS/SVG.
+- [ ] A seção de acessibilidade cobre `accTitle`, `accDescr`, contraste e alternativa textual.
+
+## 12.2 Código
+
+- [ ] Todo bloco `mermaid` é um diagrama completo e renderizável.
+- [ ] Fragmentos isolados usam `txt`, `css`, `js`, `html` ou `yaml`, não `mermaid`.
+- [ ] Exemplos usam cores hexadecimais.
+- [ ] Não há `class end ...` sugerido como solução para estilizar `[*]`.
+- [ ] CSS externo não usa seletores globais perigosos como `.mermaid *`.
+- [ ] Exemplos com YAML colocam cores `#...` entre aspas.
+
+## 12.3 Publicação
+
+- [ ] Testar exemplos no Mermaid Live Editor.
+- [ ] Testar no ambiente real de publicação.
+- [ ] Conferir tema claro/escuro.
+- [ ] Conferir contraste.
+- [ ] Conferir sumário e âncoras.
+- [ ] Conferir links externos.
+- [ ] Registrar mudanças no changelog.
+
+---
+
+# 13. Referências e recursos
+
+## 13.1 Oficiais
+
+| Recurso | URL | Uso |
+|---|---|---|
+| Documentação Mermaid | `https://mermaid.js.org/` | referência principal |
+| Nova home Mermaid | `https://mermaid.ai/` | página oficial atual |
+| Mermaid Live Editor | `https://mermaid.live` | testar sem instalar |
+| Sintaxe dos diagramas | `https://mermaid.js.org/intro/syntax-reference.html` | lista de tipos e regras gerais |
+| State Diagram | `https://mermaid.js.org/syntax/stateDiagram.html` | referência de estados |
+| Flowchart | `https://mermaid.js.org/syntax/flowchart.html` | referência de fluxogramas |
+| Sequence Diagram | `https://mermaid.js.org/syntax/sequenceDiagram.html` | referência de sequências |
+| Class Diagram | `https://mermaid.js.org/syntax/classDiagram.html` | referência de classes |
+| Entity Relationship Diagram | `https://mermaid.js.org/syntax/entityRelationshipDiagram.html` | referência de entidades e cardinalidade |
+| Usage / API | `https://mermaid.js.org/config/usage.html` | uso, integração, `run()`, `render()` e `parse()` |
+| Configuração | `https://mermaid.js.org/config/configuration.html` | frontmatter e initialize |
+| Acessibilidade | `https://mermaid.js.org/config/accessibility.html` | `accTitle`, `accDescr`, SVG acessível |
+| Repositório GitHub | `https://github.com/mermaid-js/mermaid` | código, issues e releases |
+| Releases/Changelog | `https://github.com/mermaid-js/mermaid/releases` | mudanças por versão |
+| Mermaid CLI | `https://github.com/mermaid-js/mermaid-cli` | exportação SVG/PNG/PDF |
+| Ecossistema/integrações | `https://mermaid.js.org/ecosystem/integrations-community.html` | integrações da comunidade |
+
+## 13.2 Plataformas
+
+| Recurso | URL |
+|---|---|
+| GitHub Mermaid Markdown | `https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams` |
+| GitLab Mermaid Markdown | `https://docs.gitlab.com/user/markdown/` |
+| Docusaurus Mermaid | `https://docusaurus.io/docs/api/themes/@docusaurus/theme-mermaid` |
+| MkDocs Material diagrams | `https://squidfunk.github.io/mkdocs-material/reference/diagrams/` |
+
+## 13.3 Acessibilidade
+
+| Recurso | URL |
+|---|---|
+| WCAG 2.1 | `https://www.w3.org/TR/WCAG21/` |
+| WCAG contraste mínimo | `https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum` |
+| WebAIM Contrast Checker | `https://webaim.org/resources/contrastchecker/` |
+
+---
+
+# 14. Changelog editorial
+
+## `3.1.1` — Polimento editorial final
+
+### Corrigido
+
+- Atualizado o checklist 12.1 para refletir o escopo real do guia: tipos principais com profundidade adequada e `stateDiagram-v2` como referência completa.
+- Corrigido o typo editorial de duplicação da palavra `geral` no checklist 12.1.
+- Removida a ocorrência textual de um identificador fixo específico no exemplo da seção 9.4, evitando a falsa impressão de que `mermaid.render()` ainda usa ID hardcoded.
+
+### Verificado
+
+- Confirmado que a seção 5 possui parágrafo introdutório antes das subseções dos tipos de diagrama.
+- Confirmado que os exemplos de `mermaid.render()` usam IDs dinâmicos por contador, `crypto.randomUUID()` ou fallback com timestamp e sufixo aleatório.
+
+## `3.1.0` — Correção pré-publicação e refinamento técnico
+
+### Corrigido
+
+- Adicionado o cabeçalho pai `# 5. Visão geral dos principais tipos de diagrama`, que existia no sumário mas não no corpo do documento.
+- Adicionado o cabeçalho pai `# 8. Integração em Markdown, HTML e documentação`, restaurando a hierarquia correta antes de `## 8.1 GitHub`.
+- Adicionado o cabeçalho pai `# 9. Debugging e solução de problemas`, restaurando a hierarquia correta antes de `## 9.1 Protocolo rápido de diagnóstico`.
+- Corrigida a tabela de referências oficiais da seção 13.1, separando URLs que estavam coladas em uma única célula.
+- Corrigidos exemplos com `mermaid.render()` para evitar ID fixo em renderizações repetidas.
+
+### Adicionado
+
+- Tabela de cardinalidade para `erDiagram`, incluindo `||`, `|o`/`o|`, `|{`/`}|` e `o{`/`}o`.
+- Nota sobre portabilidade no GitHub: `classDef`, `class` e `:::` são portáveis por fazerem parte da sintaxe Mermaid; CSS externo não é.
+- Configuração explícita de `securityLevel: "strict"` em `mermaid.initialize()` com ressalva sobre uso pontual de `"loose"` apenas para conteúdo confiável.
+- Explicação específica sobre por que IDs fixos em `mermaid.render()` são uma armadilha em páginas com múltiplos diagramas ou re-renderização.
+
+## `3.0.0` — Expansão para guia público completo
+
+### Adicionado
+
+- Cobertura aprofundada de `flowchart`, incluindo formas de nó, `subgraph`, rótulos de seta, tipos de seta, `classDef`, `linkStyle`, arquitetura real e pegadinhas.
+- Cobertura aprofundada de `sequenceDiagram`, incluindo `alt`, `else`, `opt`, `loop`, `par`, `activate`, `deactivate`, `note over`, `autonumber` e exemplo real de autenticação.
+- Cobertura ampliada de `classDiagram`, incluindo herança, composição, agregação, associação, dependência, link simples, interfaces, cardinalidade e exemplo real de domínio.
+- Exemplo de `gantt` com `crit`, `active`, `done` e `milestone`.
+- Explicação prática de `mermaid.run()` vs `mermaid.render()`.
+- Padrão com `mermaidRenderToken` para evitar renderização duplicada em páginas HTML local-first.
+- Fallback visível ao usuário em caso de erro de renderização Mermaid.
+- Orientação específica para modo claro/escuro sem quebrar `classDef`.
+- Tabela ampliada de `themeVariables`, incluindo `labelColor`, `altBackground`, variáveis de nota e `fontFamily` com fallback.
+- `accDescr` multilinha.
+- Lista honesta de tipos modernos Mermaid 11+, incluindo `quadrantChart`, `xychart`, `architecture`, `kanban`, `radar`, `treemap`, `venn`, `ishikawa` e `treeView`.
+
+### Corrigido
+
+- Exemplos com `fontFamily:"Arial"` foram substituídos por `system-ui, sans-serif` em trechos públicos.
+- O guia deixou de priorizar redução de linhas e passou a priorizar completude, exemplos reais e preservação do conteúdo técnico.
+- Reforço contra CSS global agressivo no modo escuro, especialmente regras em `.mermaid svg text`.
+
+## `2.0.0` — Revisão para guia público
+
+### Adicionado
+
+- Introdução: o que é Mermaid e para que serve.
+- Quick Start com Live Editor, Markdown, HTML via CDN, npm e CLI.
+- Registro explícito da versão Mermaid usada como referência.
+- Capítulo de visão geral dos principais tipos de diagrama.
+- Exemplos introdutórios de `flowchart`, `sequenceDiagram`, `classDiagram`, `stateDiagram-v2`, `erDiagram`, `gantt`, `pie`, `mindmap`, `timeline`, `gitGraph` e `journey`.
+- Seção específica sobre `stateDiagram` vs `stateDiagram-v2`.
+- Seção de integração com GitHub, GitLab, Obsidian, VS Code, Docusaurus, VitePress, MkDocs, `marked`, `markdown-it` e `remark`.
+- Seção de debugging de sintaxe Mermaid.
+- Seção de acessibilidade com `accTitle`, `accDescr`, contraste WCAG e alternativa textual.
+- Checklist final de publicação.
+- Referências ampliadas.
+
+### Corrigido
+
+- Estrutura em formato de aulas foi substituída por estrutura de referência.
+- Redundâncias do exemplo `badBadEvent` foram consolidadas em uma única seção.
+- Tabela de propriedades de `classDef` foi mantida em um único ponto.
+- Pipeline Markdown → parser → SVG → CSS foi consolidado.
+- Exemplos passaram a usar cores hexadecimais.
+- Fragmentos inválidos deixaram de aparecer como blocos `mermaid` renderizáveis.
+- A tentativa `class end badBadEvent` foi tratada como anti-padrão, não como solução.
+
+### Mantido
+
+- Profundidade técnica sobre `stateDiagram-v2`.
+- Diagnóstico de SVG/CSS.
+- Explicação de `classDef`, `class`, `:::`, tema e CSS defensivo.
+- Orientação local-first para páginas HTML com Markdown + Mermaid.
