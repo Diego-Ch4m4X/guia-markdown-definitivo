@@ -9,7 +9,6 @@
 
 | Campo | Valor |
 |---|---|
-| Versão deste guia | `3.1.1` |
 | Data da revisão | 2026-05-10 |
 | Versão Mermaid usada como referência principal | Mermaid `11.14.0` |
 | Foco aprofundado | `flowchart`, `sequenceDiagram`, `classDiagram`, `stateDiagram-v2`, `classDef`, SVG, CSS, tema e integração local-first |
@@ -18,7 +17,7 @@
 
 > **Nota editorial:** este guia prioriza completude, exemplos reais e capacidade de consulta pública. A quantidade de linhas não é usada como critério de corte.
 
-> **Nota de compatibilidade:** Mermaid evolui rápido. Um diagrama que funciona em Mermaid 11 pode falhar em ambientes que ainda usam Mermaid 10 ou versões customizadas. Antes de publicar em GitHub, GitLab, Obsidian, VS Code, Docusaurus, VitePress, MkDocs ou HTML próprio, teste no ambiente final.
+> **Nota de compatibilidade:** Mermaid evolui rápido. Um diagrama que funciona em Mermaid 11 pode falhar em ambientes que ainda usam Mermaid 10 ou versões customizadas.
 
 ---
 
