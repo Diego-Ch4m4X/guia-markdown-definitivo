@@ -3,23 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Guia Mermaid Completo em Português | Diagramas, Sintaxe, Temas e Debugging</title>
-<meta name="description" content="Guia Mermaid completo em português com as 30 famílias oficiais de diagramas, incluindo flowchart, swimlanes, sequence, state, C4, architecture, packet, event modeling, temas, API e acessibilidade.">
+<title>Guia Mermaid em Português | 30 Tipos, Sintaxe, API e Debugging</title>
+<meta name="description" content="Guia Mermaid em português com 30 famílias de diagramas, exemplos renderizados, sintaxe, temas, API, integração HTML, debugging e acessibilidade.">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="author" content="Diego-Ch4m4X">
 <meta name="theme-color" content="#0d1117" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="canonical" href="https://diego-ch4m4x.github.io/guia-markdown-definitivo/guia-mermaid.html">
 <link rel="alternate" hreflang="pt-BR" href="https://diego-ch4m4x.github.io/guia-markdown-definitivo/guia-mermaid.html">
 <meta property="og:type" content="article">
 <meta property="og:locale" content="pt_BR">
-<meta property="og:title" content="Guia Mermaid de Referência Pública">
-<meta property="og:description" content="Guia Mermaid completo em português com as 30 famílias oficiais de diagramas, incluindo flowchart, swimlanes, sequence, state, C4, architecture, packet, event modeling, temas, API e acessibilidade.">
+<meta property="og:title" content="Guia Mermaid em Português — Referência Completa">
+<meta property="og:description" content="Guia Mermaid em português com 30 famílias de diagramas, exemplos, sintaxe, temas, API, integração HTML, debugging e acessibilidade.">
 <meta property="og:url" content="https://diego-ch4m4x.github.io/guia-markdown-definitivo/guia-mermaid.html">
 <meta property="og:site_name" content="Guia Markdown Definitivo">
+<meta property="article:modified_time" content="2026-08-22T01:02:00-03:00">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Guia Mermaid de Referência Pública">
-<meta name="twitter:description" content="Guia Mermaid completo em português com as 30 famílias oficiais de diagramas, incluindo flowchart, swimlanes, sequence, state, C4, architecture, packet, event modeling, temas, API e acessibilidade.">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Guia Mermaid de Referência Pública","description":"Guia Mermaid completo em português com as 30 famílias oficiais de diagramas, incluindo flowchart, swimlanes, sequence, state, C4, architecture, packet, event modeling, temas, API e acessibilidade.","inLanguage":"pt-BR","url":"https://diego-ch4m4x.github.io/guia-markdown-definitivo/guia-mermaid.html","mainEntityOfPage":"https://diego-ch4m4x.github.io/guia-markdown-definitivo/guia-mermaid.html","isPartOf":{"@type":"CreativeWork","name":"Guia Markdown Definitivo","url":"https://diego-ch4m4x.github.io/guia-markdown-definitivo/"}}</script>
+<meta name="twitter:title" content="Guia Mermaid em Português — Referência Completa">
+<meta name="twitter:description" content="Guia Mermaid em português com 30 famílias de diagramas, exemplos, sintaxe, API, debugging e acessibilidade.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":["Article","TechArticle"],"headline":"Guia Mermaid de Referência Pública","description":"Guia Mermaid em português com 30 famílias de diagramas, exemplos renderizados, sintaxe, temas, API, integração HTML, debugging, acessibilidade e compatibilidade.","inLanguage":"pt-BR","dateModified":"2026-08-22T01:02:00-03:00","author":{"@type":"Person","name":"Diego-Ch4m4X","url":"https://github.com/Diego-Ch4m4X"},"url":"https://diego-ch4m4x.github.io/guia-markdown-definitivo/guia-mermaid.html","mainEntityOfPage":{"@type":"WebPage","@id":"https://diego-ch4m4x.github.io/guia-markdown-definitivo/guia-mermaid.html"},"isAccessibleForFree":true,"isPartOf":{"@type":"CreativeWork","name":"Guia Markdown Definitivo","url":"https://diego-ch4m4x.github.io/guia-markdown-definitivo/"},"keywords":["Mermaid","diagramas como código","flowchart","sequenceDiagram","stateDiagram-v2","classDiagram","C4","architecture","packet","Markdown"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Guia Markdown Definitivo","item":"https://diego-ch4m4x.github.io/guia-markdown-definitivo/"},{"@type":"ListItem","position":2,"name":"Guia Mermaid"}]}</script>
 
 <!-- MathJax externo: mantido para compatibilidade funcional equivalente ao guia principal -->
 <script>
@@ -112,8 +116,8 @@ button, input { font:inherit; }
 .header-search input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); background:var(--bg); }
 .search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); pointer-events:none; }
 .search-kbd { position:absolute; right:9px; top:50%; transform:translateY(-50%); border:1px solid var(--border); background:var(--bg); color:var(--text-muted); border-radius:6px; font-size:12px; padding:1px 6px; }
-.icon-btn, .github-btn { height:38px; display:inline-flex; align-items:center; justify-content:center; gap:7px; border:1px solid var(--border); border-radius:9px; color:var(--text); background:var(--bg); cursor:pointer; text-decoration:none; padding:0 11px; transition:.16s ease; }
-.icon-btn:hover, .github-btn:hover { color:var(--text); border-color:color-mix(in srgb,var(--border) 40%,var(--text)); background:var(--bg-subtle); }
+.icon-btn, .github-btn, .markdown-btn { height:38px; display:inline-flex; align-items:center; justify-content:center; gap:7px; border:1px solid var(--border); border-radius:9px; color:var(--text); background:var(--bg); cursor:pointer; text-decoration:none; padding:0 11px; transition:.16s ease; }
+.icon-btn:hover, .github-btn:hover, .markdown-btn:hover { color:var(--text); border-color:color-mix(in srgb,var(--border) 40%,var(--text)); background:var(--bg-subtle); }
 .menu-btn { display:none; }
 .layout { max-width:var(--page-max); margin:0 auto; padding:0 22px; display:grid; grid-template-columns:var(--sidebar-w) minmax(0, 1fr); gap:44px; align-items:start; }
 .sidebar { position:sticky; top:var(--header-h); height:calc(100vh - var(--header-h)); padding:25px 10px 32px 0; overflow:auto; scrollbar-width:thin; }
@@ -193,6 +197,7 @@ h2:hover .heading-link,h3:hover .heading-link,h4:hover .heading-link,.heading-li
 .article details > summary { padding:12px 15px; cursor:pointer; font-weight:600; background:var(--bg-subtle); }
 .article details > :not(summary) { margin-left:15px; margin-right:15px; }
 .article input[type="checkbox"] { accent-color:var(--accent); }
+.page-meta { margin:.4rem 0 1.5rem; color:var(--text-muted); font-size:.9rem; }
 .source-index-title { margin-top:2.2rem !important; }
 .article .footnotes { font-size:.9rem; color:var(--text-muted); }
 .footer-note { width:min(100%,var(--content-max)); margin:45px auto 0; padding-top:22px; border-top:1px solid var(--border-soft); color:var(--text-muted); font-size:13px; }
@@ -211,7 +216,7 @@ h2:hover .heading-link,h3:hover .heading-link,h4:hover .heading-link,.heading-li
 @media (max-width: 1080px) {
   .layout { grid-template-columns:260px minmax(0,1fr); gap:30px; }
   :root { --sidebar-w:260px; }
-  .github-btn span { display:none; }
+  .github-btn span, .markdown-btn span { display:none; }
 }
 @media (max-width: 820px) {
   :root { --header-h:62px; }
@@ -283,7 +288,7 @@ h2:hover .heading-link,h3:hover .heading-link,h4:hover .heading-link,.heading-li
       <input id="site-search" type="search" autocomplete="off" placeholder="Buscar no guia Mermaid…" aria-label="Buscar no guia Mermaid">
       <span class="search-kbd" aria-hidden="true">/</span>
     </div>
-    <a class="github-btn" href="./index.html" aria-label="Abrir Guia Markdown Definitivo">← <span>Guia Markdown</span></a>
+    <a class="markdown-btn" href="./" aria-label="Abrir Guia Markdown Definitivo">← <span>Guia Markdown</span></a>
     <a class="github-btn" href="https://github.com/Diego-Ch4m4X/guia-markdown-definitivo" aria-label="Abrir repositório no GitHub"><span>GitHub</span> ↗</a>
     <button class="icon-btn" id="theme-toggle" type="button" aria-label="Alternar tema"><span id="theme-icon">🌙</span></button>
   </div>
@@ -295,11 +300,12 @@ h2:hover .heading-link,h3:hover .heading-link,h4:hover .heading-link,.heading-li
     <nav class="toc-nav" id="toc-nav" aria-label="Índice do guia Mermaid"><ul><li class="toc-item"><a href="#1-o-que-é-mermaid" data-target="1-o-que-é-mermaid">1. O que é Mermaid</a></li><li class="toc-item"><a href="#2-quick-start" data-target="2-quick-start">2. Quick Start</a></li><li class="toc-item"><a href="#3-onde-mermaid-roda" data-target="3-onde-mermaid-roda">3. Onde Mermaid roda</a></li><li class="toc-item"><a href="#4-como-escolher-o-tipo-de-diagrama" data-target="4-como-escolher-o-tipo-de-diagrama">4. Como escolher o tipo de diagrama</a></li><li class="toc-item"><a href="#5-visão-geral-dos-principais-tipos-de-diagrama" data-target="5-visão-geral-dos-principais-tipos-de-diagrama">5. Visão geral dos principais tipos de diagrama</a></li><li class="toc-item"><a href="#6-statediagram-v2--referência-completa" data-target="6-statediagram-v2--referência-completa">6. stateDiagram-v2 — referência completa</a></li><li class="toc-item"><a href="#7-personalização-visual-classdef-tema-e-css" data-target="7-personalização-visual-classdef-tema-e-css">7. Personalização visual: classDef, tema e CSS</a></li><li class="toc-item"><a href="#8-integração-em-markdown-html-e-documentação" data-target="8-integração-em-markdown-html-e-documentação">8. Integração em Markdown, HTML e documentação</a></li><li class="toc-item"><a href="#9-debugging-e-solução-de-problemas" data-target="9-debugging-e-solução-de-problemas">9. Debugging e solução de problemas</a></li><li class="toc-item"><a href="#10-acessibilidade" data-target="10-acessibilidade">10. Acessibilidade</a></li><li class="toc-item"><a href="#11-boas-práticas-para-guia-público" data-target="11-boas-práticas-para-guia-público">11. Boas práticas para guia público</a></li><li class="toc-item"><a href="#12-checklist-final-de-publicação" data-target="12-checklist-final-de-publicação">12. Checklist final de publicação</a></li><li class="toc-item"><a href="#13-referências-e-recursos" data-target="13-referências-e-recursos">13. Referências e recursos</a></li><li class="toc-item"><a href="#14-changelog-editorial" data-target="14-changelog-editorial">14. Changelog editorial</a></li></ul></nav>
   </aside>
   <main class="main" id="conteudo">
-    <article class="article" id="topo" itemscope itemtype="https://schema.org/TechArticle">
-      <p class="guide-backlink"><a href="./index.html">← Guia Markdown Definitivo</a></p><h1 id="guia-mermaid-de-referência-pública">Guia Mermaid de Referência Pública</h1>
+    <article class="article" id="topo">
+      <p class="guide-backlink"><a href="./">← Guia Markdown Definitivo</a></p><h1 id="guia-mermaid-de-referência-pública">Guia Mermaid de Referência Pública</h1>
 <blockquote>
 <p><strong>Guia revisado para publicação</strong><br/>
 Escopo: cobertura prática dos principais tipos de diagrama Mermaid, com aprofundamento em <code>flowchart</code>, <code>sequenceDiagram</code>, <code>classDiagram</code> e referência completa de <code>stateDiagram-v2</code>, além de personalização visual, integração em Markdown/HTML, depuração e acessibilidade.</p>
+<p class="page-meta"><strong>Última atualização da página:</strong> 22 de agosto de 2026.</p>
 </blockquote>
 <hr/>
 <h2 id="metadados-do-guia">Metadados do guia<button aria-label="Copiar link para Metadados do guia" class="heading-link" data-anchor="metadados-do-guia" type="button">#</button></h2>
@@ -918,20 +924,9 @@ mmdc -i diagrama.mmd -o diagrama.svg
     Token --&gt; Dashboard[Abrir dashboard]
     Erro --&gt; Login</div></div>
 <p>Boas práticas para rótulos:</p>
-<p>| Faça | Evite |
-|---|---|
-| <code>--&gt;|Sim|</code> e <code>--&gt;|Não|</code> em decisões | deixar setas saindo de losango sem rótulo |
-| rótulos curtos: <code>200 OK</code>, <code>timeout</code>, <code>cache miss</code> | frases longas que entortam o layout |
-| rótulos técnicos quando o público é técnico | esconder protocolo/status importante |</p>
+<div class="table-wrap"><table><thead><tr><th>Faça</th><th>Evite</th></tr></thead><tbody><tr><td><code>--&gt;|Sim|</code> e <code>--&gt;|Não|</code> em decisões</td><td>deixar setas saindo de losango sem rótulo</td></tr><tr><td>rótulos curtos: <code>200 OK</code>, <code>timeout</code>, <code>cache miss</code></td><td>frases longas que entortam o layout</td></tr><tr><td>rótulos técnicos quando o público é técnico</td><td>esconder protocolo/status importante</td></tr></tbody></table></div>
 <h4 id="514-tipos-de-seta-e-linha">5.1.4 Tipos de seta e linha<button aria-label="Copiar link para 5.1.4 Tipos de seta e linha" class="heading-link" data-anchor="514-tipos-de-seta-e-linha" type="button">#</button></h4>
-<p>| Sintaxe | Leitura prática |
-|---|---|
-| <code>A --&gt; B</code> | fluxo direcional padrão |
-| <code>A --- B</code> | relação sem direção forte |
-| <code>A -.-&gt; B</code> | dependência, fallback, caminho indireto |
-| <code>A ==&gt; B</code> | fluxo forte/importante |
-| <code>A -- texto --&gt; B</code> | seta com texto alternativo |
-| <code>A --&gt;|texto| B</code> | seta rotulada mais legível |</p>
+<div class="table-wrap"><table><thead><tr><th>Sintaxe</th><th>Leitura prática</th></tr></thead><tbody><tr><td><code>A --&gt; B</code></td><td>fluxo direcional padrão</td></tr><tr><td><code>A --- B</code></td><td>relação sem direção forte</td></tr><tr><td><code>A -.-&gt; B</code></td><td>dependência, fallback, caminho indireto</td></tr><tr><td><code>A ==&gt; B</code></td><td>fluxo forte/importante</td></tr><tr><td><code>A -- texto --&gt; B</code></td><td>seta com texto alternativo</td></tr><tr><td><code>A --&gt;|texto| B</code></td><td>seta rotulada mais legível</td></tr></tbody></table></div>
 <div class="code-shell mermaid-source" data-language="mermaid"><div class="code-toolbar"><span class="code-language">mermaid</span></div><pre><code class="language-mermaid">flowchart LR
     Cliente --&gt; API
     API --&gt; Banco[(PostgreSQL)]
@@ -1664,15 +1659,7 @@ mmdc -i diagrama.mmd -o diagrama.svg
       #validarSaldo(decimal valor)
     }</div></div>
 <h4 id="533-tipos-de-relacionamento">5.3.3 Tipos de relacionamento<button aria-label="Copiar link para 5.3.3 Tipos de relacionamento" class="heading-link" data-anchor="533-tipos-de-relacionamento" type="button">#</button></h4>
-<p>| Notação | Nome | Leitura prática |
-|---|---|---|
-| <code>&lt;|--</code> | herança/generalização | <code>Cachorro</code> é um <code>Animal</code> |
-| <code>*--</code> | composição | parte depende fortemente do todo |
-| <code>o--</code> | agregação | parte pertence ao todo, mas pode existir fora dele |
-| <code>--&gt;</code> | associação | uma classe conhece/usa a outra |
-| <code>..&gt;</code> | dependência | uso pontual, parâmetro, retorno, chamada |
-| <code>--</code> | link simples | relação genérica sem direção forte |
-| <code>..|&gt;</code> | realização/interface | classe implementa interface |</p>
+<div class="table-wrap"><table><thead><tr><th>Notação</th><th>Nome</th><th>Leitura prática</th></tr></thead><tbody><tr><td><code>&lt;|--</code></td><td>herança/generalização</td><td><code>Cachorro</code> é um <code>Animal</code></td></tr><tr><td><code>*--</code></td><td>composição</td><td>parte depende fortemente do todo</td></tr><tr><td><code>o--</code></td><td>agregação</td><td>parte pertence ao todo, mas pode existir fora dele</td></tr><tr><td><code>--&gt;</code></td><td>associação</td><td>uma classe conhece/usa a outra</td></tr><tr><td><code>..&gt;</code></td><td>dependência</td><td>uso pontual, parâmetro, retorno, chamada</td></tr><tr><td><code>--</code></td><td>link simples</td><td>relação genérica sem direção forte</td></tr><tr><td><code>..|&gt;</code></td><td>realização/interface</td><td>classe implementa interface</td></tr></tbody></table></div>
 <div class="code-shell mermaid-source" data-language="mermaid"><div class="code-toolbar"><span class="code-language">mermaid</span></div><pre><code class="language-mermaid">classDiagram
     Animal &lt;|-- Cachorro
     Animal &lt;|-- Gato
@@ -1983,12 +1970,7 @@ mmdc -i diagrama.mmd -o diagrama.svg
     }</div></div>
 <h4 id="551-notação-de-cardinalidade-em-erdiagram">5.5.1 Notação de cardinalidade em <code>erDiagram</code><button aria-label="Copiar link para 5.5.1 Notação de cardinalidade em erDiagram" class="heading-link" data-anchor="551-notação-de-cardinalidade-em-erdiagram" type="button">#</button></h4>
 <p>A cardinalidade aparece nas duas pontas da relação. Cada marcador combina <strong>mínimo</strong> e <strong>máximo</strong> de ocorrência.</p>
-<p>| Marcador | Leitura | Modelo mental |
-|---|---|---|
-| <code>||</code> | exatamente um | obrigatório e único |
-| <code>|o</code> / <code>o|</code> | zero ou um | opcional, no máximo um |
-| <code>|{</code> / <code>}|</code> | um ou muitos | obrigatório, pode repetir |
-| <code>o{</code> / <code>}o</code> | zero ou muitos | opcional, pode repetir |</p>
+<div class="table-wrap"><table><thead><tr><th>Marcador</th><th>Leitura</th><th>Modelo mental</th></tr></thead><tbody><tr><td><code>||</code></td><td>exatamente um</td><td>obrigatório e único</td></tr><tr><td><code>|o</code> / <code>o|</code></td><td>zero ou um</td><td>opcional, no máximo um</td></tr><tr><td><code>|{</code> / <code>}|</code></td><td>um ou muitos</td><td>obrigatório, pode repetir</td></tr><tr><td><code>o{</code> / <code>}o</code></td><td>zero ou muitos</td><td>opcional, pode repetir</td></tr></tbody></table></div>
 <p>Exemplo de leitura:</p>
 <div class="code-shell mermaid-source" data-language="mermaid"><div class="code-toolbar"><span class="code-language">mermaid</span></div><pre><code class="language-mermaid">erDiagram
     CLIENTE ||--o{ PEDIDO : realiza
@@ -1999,11 +1981,7 @@ mmdc -i diagrama.mmd -o diagrama.svg
     PEDIDO ||--|{ ITEM_PEDIDO : contém
     PRODUTO ||--o{ ITEM_PEDIDO : aparece_em</div></div>
 <p>Como interpretar:</p>
-<p>| Relação | Leitura prática |
-|---|---|
-| <code>CLIENTE ||--o{ PEDIDO</code> | um cliente pode realizar zero ou muitos pedidos; cada pedido pertence a exatamente um cliente |
-| <code>PEDIDO ||--|{ ITEM_PEDIDO</code> | um pedido contém um ou muitos itens; cada item pertence a exatamente um pedido |
-| <code>PRODUTO ||--o{ ITEM_PEDIDO</code> | um produto pode aparecer em zero ou muitos itens de pedido; cada item referencia exatamente um produto |</p>
+<div class="table-wrap"><table><thead><tr><th>Relação</th><th>Leitura prática</th></tr></thead><tbody><tr><td><code>CLIENTE ||--o{ PEDIDO</code></td><td>um cliente pode realizar zero ou muitos pedidos; cada pedido pertence a exatamente um cliente</td></tr><tr><td><code>PEDIDO ||--|{ ITEM_PEDIDO</code></td><td>um pedido contém um ou muitos itens; cada item pertence a exatamente um pedido</td></tr><tr><td><code>PRODUTO ||--o{ ITEM_PEDIDO</code></td><td>um produto pode aparecer em zero ou muitos itens de pedido; cada item referencia exatamente um produto</td></tr></tbody></table></div>
 <p>Além da cardinalidade, a linha também indica se a relação é <strong>identificadora</strong> ou <strong>não identificadora</strong>:</p>
 <div class="table-wrap"><table>
 <thead>
@@ -4998,7 +4976,7 @@ Validar novamente em ambientes que usem outra versão ou renderizadores próprio
 </ul>
 
     </article>
-    <footer class="footer-note">Conteúdo integral do <code>GUIA_MERMAID.md</code> apresentado em HTML para leitura, acessibilidade e indexação. Documentação oficial auditada: Mermaid 11.17.0; renderizador estável fixado nesta página: Mermaid 11.16.1 via CDN. ZenUML é carregado como plugin externo. · <a href="./index.html">Voltar ao Guia Markdown Definitivo</a></footer>
+    <footer class="footer-note">Conteúdo integral do <code>GUIA_MERMAID.md</code> apresentado em HTML para leitura, acessibilidade e indexação. Documentação oficial auditada: Mermaid 11.17.0; renderizador estável fixado nesta página: Mermaid 11.16.1 via CDN. ZenUML é carregado como plugin externo. · <a href="./">Voltar ao Guia Markdown Definitivo</a></footer>
   </main>
 </div>
 <div class="search-panel" id="search-panel" role="dialog" aria-label="Resultados da busca"></div>
