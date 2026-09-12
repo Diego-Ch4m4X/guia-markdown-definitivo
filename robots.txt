@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://diego-ch4m4x.github.io/guia-markdown-definitivo/sitemap.xml
